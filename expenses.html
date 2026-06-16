@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monthly Expenses — Blueground Malaysia</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f7f6f2; color: #1a1a1a; font-family: 'DM Sans', system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+  .topbar { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .topbar-back { font-size: 13px; color: #888; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.15s; }
+  .topbar-back:hover { color: #3B6D11; }
+  .topbar-divider { width: 1px; height: 18px; background: #e4e4e0; }
+  .topbar-name { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+  .topbar-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #633806; background: #FAEEDA; padding: 3px 10px; border-radius: 100px; }
+  .header { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 2rem 2.5rem 1.75rem; }
+  .header-title { font-size: 22px; font-weight: 500; color: #1a1a1a; margin-bottom: 4px; }
+  .header-sub { font-size: 13px; color: #999; }
+  .main { max-width: 860px; margin: 0 auto; padding: 3rem 2rem 5rem; flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; }
+  .placeholder-box { background: #fff; border: 0.5px solid #e4e4e0; border-radius: 14px; padding: 3rem 2.5rem; text-align: center; width: 100%; max-width: 500px; }
+  .placeholder-icon { font-size: 36px; margin-bottom: 1rem; }
+  .placeholder-title { font-size: 18px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px; }
+  .placeholder-desc { font-size: 13px; color: #999; line-height: 1.7; }
+  .wip-badge { display: inline-block; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #633806; background: #FAEEDA; padding: 4px 12px; border-radius: 100px; margin-bottom: 1.25rem; }
+  .back-link { font-size: 13px; color: #3B6D11; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-top: 1.5rem; }
+  .back-link:hover { text-decoration: underline; }
+  .footer { border-top: 1px solid #e8e8e4; padding: 1.25rem 2.5rem; font-size: 11px; color: #ccc; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; background: #fff; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="topbar-back" href="index.html">← Back</a>
+    <div class="topbar-divider"></div>
+    <span class="topbar-name">Monthly Fixed &amp; Variable Expenses</span>
+  </div>
+  <span class="topbar-badge">In progress</span>
+</div>
+
+<div class="header">
+  <div class="header-title">Monthly Fixed &amp; Variable Expenses</div>
+  <div class="header-sub">Blueground (M) Sdn Bhd · Operational expense breakdown</div>
+</div>
+
+<main class="main">
+  <div class="placeholder-box">
+    <div class="placeholder-icon">📋</div>
+    <div class="wip-badge">Work in progress</div>
+    <div class="placeholder-title">This page is being built</div>
+    <div class="placeholder-desc">The monthly fixed and variable expenses analysis is currently being prepared. It will include a detailed breakdown of all recurring costs across the portfolio, segmented by fixed and variable categories.</div>
+    <a class="back-link" href="index.html">← Return to dashboard</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>Blueground (M) Sdn Bhd — Internal Portal</span>
+  <span>Confidential · Not for public distribution</span>
+</footer>
+
+</body>
+</html>
