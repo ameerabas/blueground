@@ -3,563 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blueground Malaysia — Burn Rate & Expansion Budget</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Blueground Malaysia — Internal Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy: #0D1B2A;
-    --navy-mid: #162336;
-    --navy-light: #1E3148;
-    --navy-border: #263d56;
-    --gold: #C9A84C;
-    --gold-light: #E2C170;
-    --gold-dim: rgba(201,168,76,0.15);
-    --red: #E05252;
-    --green: #3DBE8C;
-    --blue-accent: #4A90D9;
-    --text-primary: #F0EDE8;
-    --text-secondary: #8FA8C0;
-    --text-muted: #4E6880;
-    --font-display: 'DM Serif Display', Georgia, serif;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'DM Mono', monospace;
-  }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f7f6f2; color: #1a1a1a; font-family: 'DM Sans', system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
 
-  body {
-    background: var(--navy);
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    font-size: 14px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+  .topbar { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .topbar-dot { width: 10px; height: 10px; border-radius: 50%; background: #3B6D11; }
+  .topbar-name { font-size: 15px; font-weight: 500; color: #1a1a1a; letter-spacing: -0.01em; }
+  .topbar-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; background: #f0f0ec; padding: 3px 10px; border-radius: 100px; }
 
-  /* ── Header ── */
-  .header {
-    background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 100%);
-    border-bottom: 1px solid var(--navy-border);
-    padding: 2rem 2.5rem 1.75rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-  .brand { }
-  .brand-name {
-    font-family: var(--font-display);
-    font-size: 26px;
-    color: var(--text-primary);
-    letter-spacing: 0.01em;
-    line-height: 1.2;
-  }
-  .brand-name span { color: var(--gold); }
-  .brand-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 4px;
-  }
-  .header-badge {
-    background: var(--gold-dim);
-    border: 1px solid rgba(201,168,76,0.3);
-    color: var(--gold-light);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 5px 12px;
-    border-radius: 100px;
-    align-self: flex-start;
-    margin-top: 4px;
-  }
-  .note-strip {
-    margin-top: 1.25rem;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--navy-border);
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.7;
-  }
-  .note-strip strong { color: var(--gold-light); font-weight: 500; }
+  .hero { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 4rem 2.5rem 3.5rem; text-align: center; }
+  .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #3B6D11; margin-bottom: 1rem; }
+  .hero-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 42px; font-weight: 400; color: #1a1a1a; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  .hero-sub { font-size: 15px; color: #888; max-width: 480px; margin: 0 auto; line-height: 1.7; }
 
-  /* ── Layout ── */
-  .main { max-width: 1200px; margin: 0 auto; padding: 2rem 2.5rem 4rem; }
+  .main { max-width: 860px; margin: 0 auto; padding: 3rem 2rem 5rem; flex: 1; width: 100%; }
 
-  /* ── Section label ── */
-  .section-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--navy-border);
-  }
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin: 0 0 16px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 0.5px; background: #e4e4e0; }
 
-  /* ── Divider ── */
-  .divider { border: none; border-top: 1px solid var(--navy-border); margin: 2rem 0; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 3rem; }
 
-  /* ── Sliders ── */
-  .sliders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 1.25rem; margin-bottom: 2rem; }
-  .slider-card {
-    background: var(--navy-mid);
-    border: 1px solid var(--navy-border);
-    border-radius: 12px;
-    padding: 16px 18px;
-  }
-  .slider-card-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-  .slider-card-value {
-    font-family: var(--font-display);
-    font-size: 28px;
-    color: var(--gold-light);
-    line-height: 1;
-    margin-bottom: 10px;
-  }
-  input[type=range] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 4px;
-    background: var(--navy-light);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--gold);
-    border: 2px solid var(--navy);
-    box-shadow: 0 0 6px rgba(201,168,76,0.4);
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--gold);
-    border: 2px solid var(--navy);
-  }
-  .slider-range-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 5px; }
+  .card { background: #fff; border: 0.5px solid #e4e4e0; border-radius: 14px; padding: 24px 26px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+  .card:hover { border-color: #97C459; box-shadow: 0 2px 16px rgba(59,109,17,0.08); }
+  .card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .card-icon.green { background: #EAF3DE; }
+  .card-icon.blue { background: #E6F1FB; }
+  .card-icon.amber { background: #FAEEDA; }
+  .card-icon.placeholder { background: #f5f5f2; }
+  .card-tag { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 100px; display: inline-flex; align-self: flex-start; }
+  .card-tag.live { background: #EAF3DE; color: #27500A; }
+  .card-tag.wip { background: #FAEEDA; color: #633806; }
+  .card-tag.soon { background: #f0f0ec; color: #888; }
+  .card-title { font-size: 16px; font-weight: 500; color: #1a1a1a; line-height: 1.3; }
+  .card-desc { font-size: 13px; color: #888; line-height: 1.65; }
+  .card-arrow { font-size: 18px; color: #ccc; align-self: flex-end; margin-top: auto; transition: color 0.15s, transform 0.15s; }
+  .card:hover .card-arrow { color: #3B6D11; transform: translateX(3px); }
+  .card.disabled { pointer-events: none; opacity: 0.6; }
 
-  /* ── Metrics ── */
-  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; margin-bottom: 2rem; }
-  .metric-card {
-    background: var(--navy-mid);
-    border: 1px solid var(--navy-border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    position: relative;
-    overflow: hidden;
-  }
-  .metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    border-radius: 10px 10px 0 0;
-  }
-  .metric-card.gold::before { background: var(--gold); }
-  .metric-card.red::before { background: var(--red); }
-  .metric-card.green::before { background: var(--green); }
-  .metric-card.blue::before { background: var(--blue-accent); }
-  .metric-card.neutral::before { background: var(--navy-border); }
-  .metric-card-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
-  .metric-card-value { font-family: var(--font-mono); font-size: 17px; font-weight: 500; color: var(--text-primary); }
-  .metric-card-value.c-gold { color: var(--gold-light); }
-  .metric-card-value.c-red { color: var(--red); }
-  .metric-card-value.c-green { color: var(--green); }
-  .metric-card-value.c-blue { color: var(--blue-accent); }
+  .info-strip { background: #fff; border: 0.5px solid #e4e4e0; border-radius: 10px; padding: 14px 18px; font-size: 12px; color: #999; line-height: 1.7; display: flex; gap: 10px; align-items: flex-start; }
+  .info-dot { width: 6px; height: 6px; border-radius: 50%; background: #3B6D11; margin-top: 6px; flex-shrink: 0; }
 
-  /* ── Outcome boxes ── */
-  .outcome-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 10px; margin-bottom: 2rem; }
-  .outcome-card {
-    background: var(--navy-mid);
-    border: 1px solid var(--navy-border);
-    border-radius: 10px;
-    padding: 14px 18px;
-  }
-  .outcome-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
-  .outcome-value { font-family: var(--font-mono); font-size: 16px; font-weight: 500; color: var(--text-primary); }
-  .outcome-value.c-red { color: var(--red); }
-  .outcome-value.c-green { color: var(--green); }
-  .outcome-value.c-gold { color: var(--gold-light); }
-
-  /* ── Charts ── */
-  .chart-row { display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 2rem; }
-  .chart-card {
-    background: var(--navy-mid);
-    border: 1px solid var(--navy-border);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .chart-card-title {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-bottom: 4px;
-  }
-  .chart-card-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
-  .swatch { width: 8px; height: 8px; border-radius: 2px; }
-  .chart-wrap { position: relative; width: 100%; height: 300px; }
-  .chart-wrap-sm { position: relative; width: 100%; height: 220px; }
-
-  /* ── Table ── */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--font-mono); }
-  th {
-    font-family: var(--font-body);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 8px 12px;
-    text-align: right;
-    border-bottom: 1px solid var(--navy-border);
-    white-space: nowrap;
-  }
-  th:first-child { text-align: left; }
-  td {
-    padding: 7px 12px;
-    text-align: right;
-    border-bottom: 1px solid rgba(38,61,86,0.5);
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
-  td:first-child { text-align: left; color: var(--text-primary); font-weight: 500; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-  tr.at-target td { background: rgba(61,190,140,0.05); }
-  tr.in-red td { background: rgba(224,82,82,0.06); }
-  .c-red { color: var(--red) !important; }
-  .c-green { color: var(--green) !important; }
-  .c-gold { color: var(--gold-light) !important; }
-
-  /* ── Footer ── */
-  .footer {
-    border-top: 1px solid var(--navy-border);
-    padding: 1.5rem 2.5rem;
-    font-size: 11px;
-    color: var(--text-muted);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
+  .footer { border-top: 1px solid #e8e8e4; padding: 1.25rem 2.5rem; font-size: 11px; color: #ccc; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; background: #fff; }
 
   @media (max-width: 600px) {
-    .header { padding: 1.5rem 1.25rem; }
-    .main { padding: 1.25rem 1rem 3rem; }
-    .brand-name { font-size: 20px; }
+    .topbar { padding: 0 1.25rem; }
+    .hero { padding: 3rem 1.25rem 2.5rem; }
+    .hero-title { font-size: 30px; }
+    .main { padding: 2rem 1.25rem 4rem; }
+    .footer { padding: 1rem 1.25rem; }
   }
 </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-top">
-    <div class="brand">
-      <div class="brand-name">Blueground <span>Malaysia</span></div>
-      <div class="brand-sub">Blueground (M) Sdn Bhd · Mid-Term Rental Portfolio</div>
-    </div>
-    <div class="header-badge">Financial Model · Confidential</div>
-  </div>
-  <div class="note-strip">
-    Base gross burn of <strong>RM 119,224</strong> already includes rent + utilities for all <strong>23 existing units</strong>.
-    Each new <strong>fixed-rent</strong> unit adds <strong>RM 4,000/mo</strong> recurring (RM 3,500 rent + RM 500 utilities) plus a one-off capex of <strong>RM 16,750</strong> (deposit + advance + setup).
-    Each new <strong>rev-share</strong> unit adds <strong>RM 500/mo</strong> (utilities only) plus a one-off setup of <strong>RM 8,000</strong>.
-    For every 10 fixed-rent units added, 3 rev-share units are added. Revenue for new units starts the <strong>following month</strong>.
-  </div>
-</header>
+<div class="topbar">
+  <a class="topbar-brand" href="index.html">
+    <div class="topbar-dot"></div>
+    <span class="topbar-name">Blueground Malaysia</span>
+  </a>
+  <span class="topbar-badge">Internal Portal</span>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Blueground (M) Sdn Bhd</div>
+  <h1 class="hero-title">Internal Dashboard</h1>
+  <p class="hero-sub">Financial models, forecasts, and operational reports for internal and shareholder use.</p>
+</div>
 
 <main class="main">
 
-  <!-- SLIDERS -->
-  <div class="section-label">Expansion parameters</div>
-  <div class="sliders-grid">
-    <div class="slider-card">
-      <div class="slider-card-label">Units added per month</div>
-      <div class="slider-card-value" id="v-units">6</div>
-      <input type="range" min="1" max="15" value="6" step="1" id="sl-units">
-      <div class="slider-range-labels"><span>1</span><span>15</span></div>
-    </div>
-    <div class="slider-card">
-      <div class="slider-card-label">Target portfolio size</div>
-      <div class="slider-card-value" id="v-target">70</div>
-      <input type="range" min="30" max="120" value="70" step="1" id="sl-target">
-      <div class="slider-range-labels"><span>30</span><span>120</span></div>
-    </div>
-    <div class="slider-card">
-      <div class="slider-card-label">Occupancy target (%)</div>
-      <div class="slider-card-value" id="v-occ">80%</div>
-      <input type="range" min="65" max="95" value="80" step="1" id="sl-occ">
-      <div class="slider-range-labels"><span>65%</span><span>95%</span></div>
-    </div>
+  <div class="section-label">Financial reports</div>
+  <div class="cards">
+
+    <a class="card" href="forecast.html">
+      <div class="card-icon green">📈</div>
+      <span class="card-tag live">Live</span>
+      <div class="card-title">Burn Rate &amp; Expansion Forecast</div>
+      <div class="card-desc">Interactive model showing monthly burn, revenue ramp, cash injections, breakeven point, and portfolio growth up to 200 units.</div>
+      <div class="card-arrow">→</div>
+    </a>
+
+    <a class="card" href="expenses.html">
+      <div class="card-icon amber">📋</div>
+      <span class="card-tag wip">In progress</span>
+      <div class="card-title">Monthly Fixed &amp; Variable Expenses</div>
+      <div class="card-desc">Detailed breakdown of recurring fixed costs and variable operating expenses across the portfolio.</div>
+      <div class="card-arrow">→</div>
+    </a>
+
   </div>
 
-  <hr class="divider">
-
-  <!-- CURRENT SNAPSHOT -->
-  <div class="section-label">Current position — 23 units</div>
-  <div class="metrics-grid" id="metrics-grid"></div>
-
-  <!-- EXPANSION OUTCOME -->
-  <div class="section-label">Expansion outcome</div>
-  <div class="outcome-grid" id="outcome-grid"></div>
-
-  <hr class="divider">
-
-  <!-- CHART 1 -->
-  <div class="section-label">Bank balance &amp; burn over time</div>
-  <div class="chart-card" style="margin-bottom:1.25rem;">
-    <div class="chart-card-title">Balance, Gross Burn, Revenue &amp; Net Burn (RM)</div>
-    <div class="chart-card-sub">Green band = target reached · Red band = balance negative</div>
-    <div class="legend">
-      <div class="legend-item"><div class="swatch" style="background:#4A90D9;"></div> Bank balance</div>
-      <div class="legend-item"><div class="swatch" style="background:#E05252;"></div> Gross burn</div>
-      <div class="legend-item"><div class="swatch" style="background:#3DBE8C;"></div> Revenue</div>
-      <div class="legend-item"><div class="swatch" style="background:#C9A84C;"></div> Net burn</div>
-    </div>
-    <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+  <div class="info-strip">
+    <div class="info-dot"></div>
+    <span>This portal is for internal use and shareholder review only. All data is confidential. Additional pages will be added as they are completed. For access queries, contact the finance team.</span>
   </div>
-
-  <!-- CHART 2 -->
-  <div class="section-label">Portfolio growth &amp; revenue</div>
-  <div class="chart-card" style="margin-bottom:2rem;">
-    <div class="chart-card-title">Unit count (fixed vs rev-share) and monthly revenue</div>
-    <div class="legend">
-      <div class="legend-item"><div class="swatch" style="background:rgba(61,190,140,0.5);"></div> Fixed-rent units</div>
-      <div class="legend-item"><div class="swatch" style="background:rgba(74,144,217,0.5);"></div> Rev-share units</div>
-      <div class="legend-item"><div class="swatch" style="background:#C9A84C;"></div> Monthly revenue</div>
-    </div>
-    <div class="chart-wrap-sm"><canvas id="chart2"></canvas></div>
-  </div>
-
-  <hr class="divider">
-
-  <!-- TABLE -->
-  <div class="section-label">Month-by-month budget table</div>
-  <div class="table-wrap"><table id="budget-table"></table></div>
 
 </main>
 
 <footer class="footer">
-  <span>Blueground (M) Sdn Bhd — Internal Financial Model</span>
-  <span>For shareholder review only · Confidential</span>
+  <span>Blueground (M) Sdn Bhd — Internal Portal</span>
+  <span>Confidential · Not for public distribution</span>
 </footer>
 
-<script>
-const BASE_UNITS = 23;
-const BASE_BURN = 119224;
-const BASE_BALANCE = 235000;
-const BASE_OCC = 0.65;
-const AVG_REV_PER_UNIT = 2608;
-const RENT_NEW = 3500;
-const UTIL_NEW = 500;
-const DEPOSIT = 1.5 * RENT_NEW;
-const ADV_RENTAL = 1.0 * RENT_NEW;
-const SETUP = 8000;
-
-function fmt(n) {
-  const abs = Math.abs(Math.round(n));
-  return (n < 0 ? '-' : '') + 'RM ' + abs.toLocaleString();
-}
-function fmtK(n) {
-  const abs = Math.abs(Math.round(n / 1000));
-  return (n < 0 ? '-' : '') + 'RM ' + abs + 'k';
-}
-
-function computeModel(unitsPerMonth, target, occTarget) {
-  const rows = [];
-  let balance = BASE_BALANCE;
-  let totalUnits = BASE_UNITS;
-  let totalFixed = BASE_UNITS;
-  let totalRS = 0;
-  let currentOcc = BASE_OCC;
-  const targetOcc = occTarget / 100;
-  const expansionMonths = Math.ceil((target - BASE_UNITS) / unitsPerMonth);
-  const numMonths = Math.max(expansionMonths + 3, 14);
-  const occRampPerMonth = (targetOcc - BASE_OCC) / Math.max(expansionMonths, 1);
-
-  for (let m = 1; m <= numMonths; m++) {
-    const addedThisMonth = (totalUnits < target) ? Math.min(unitsPerMonth, target - totalUnits) : 0;
-    const addedFixed = Math.round(addedThisMonth * (10 / 13));
-    const addedRS = addedThisMonth - addedFixed;
-
-    const capex = addedFixed * (DEPOSIT + ADV_RENTAL + SETUP) + addedRS * SETUP;
-    const newFixedSoFar = totalFixed - BASE_UNITS;
-    const newRSSoFar = totalRS;
-    const incrementalRecurring = newFixedSoFar * (RENT_NEW + UTIL_NEW) + newRSSoFar * UTIL_NEW;
-    const grossBurn = BASE_BURN + incrementalRecurring + capex;
-
-    currentOcc = Math.min(targetOcc, currentOcc + occRampPerMonth);
-    const occRatio = currentOcc / BASE_OCC;
-    const revenue = Math.round(totalUnits * AVG_REV_PER_UNIT * occRatio);
-    const netBurn = grossBurn - revenue;
-    balance -= netBurn;
-
-    rows.push({
-      m, totalUnits, addedThisMonth, addedFixed, addedRS,
-      totalFixed, totalRS,
-      capex: Math.round(capex),
-      incrementalRecurring: Math.round(incrementalRecurring),
-      grossBurn: Math.round(grossBurn),
-      revenue,
-      netBurn: Math.round(netBurn),
-      balance: Math.round(balance),
-      occ: Math.round(currentOcc * 100)
-    });
-
-    totalFixed += addedFixed;
-    totalRS += addedRS;
-    totalUnits += addedThisMonth;
-  }
-  return rows;
-}
-
-let c1 = null, c2 = null;
-
-function render() {
-  const unitsPerMonth = parseInt(document.getElementById('sl-units').value);
-  const target = parseInt(document.getElementById('sl-target').value);
-  const occTarget = parseInt(document.getElementById('sl-occ').value);
-
-  document.getElementById('v-units').textContent = unitsPerMonth;
-  document.getElementById('v-target').textContent = target;
-  document.getElementById('v-occ').textContent = occTarget + '%';
-
-  const data = computeModel(unitsPerMonth, target, occTarget);
-  const baseRev = Math.round(BASE_UNITS * AVG_REV_PER_UNIT);
-  const baseNet = BASE_BURN - baseRev;
-  const baseRunway = baseNet > 0 ? (BASE_BALANCE / baseNet).toFixed(1) : '∞';
-
-  document.getElementById('metrics-grid').innerHTML = `
-    <div class="metric-card gold"><div class="metric-card-label">Units (now)</div><div class="metric-card-value c-gold">23</div></div>
-    <div class="metric-card red"><div class="metric-card-label">Gross burn</div><div class="metric-card-value c-red">${fmtK(BASE_BURN)}</div></div>
-    <div class="metric-card green"><div class="metric-card-label">Revenue (65% occ)</div><div class="metric-card-value c-green">${fmtK(baseRev)}</div></div>
-    <div class="metric-card red"><div class="metric-card-label">Net burn / month</div><div class="metric-card-value c-red">${fmtK(baseNet)}</div></div>
-    <div class="metric-card gold"><div class="metric-card-label">Bank balance</div><div class="metric-card-value c-gold">${fmtK(BASE_BALANCE)}</div></div>
-    <div class="metric-card neutral"><div class="metric-card-label">Runway (no expansion)</div><div class="metric-card-value">${baseRunway} mo</div></div>
-  `;
-
-  const depletionRow = data.find(d => d.balance < 0);
-  const minBalance = Math.min(...data.map(d => d.balance));
-  const additionalFunding = minBalance < 0 ? Math.abs(minBalance) : 0;
-  const expansionMonths = Math.ceil((target - BASE_UNITS) / unitsPerMonth);
-  const balAtTarget = data[Math.min(expansionMonths - 1, data.length - 1)]?.balance || 0;
-
-  document.getElementById('outcome-grid').innerHTML = `
-    <div class="outcome-card"><div class="outcome-label">Months to reach ${target} units</div><div class="outcome-value c-gold">${expansionMonths} months</div></div>
-    <div class="outcome-card"><div class="outcome-label">Balance when target reached</div><div class="outcome-value ${balAtTarget < 0 ? 'c-red' : 'c-green'}">${fmt(balAtTarget)}</div></div>
-    <div class="outcome-card"><div class="outcome-label">Funds depleted</div><div class="outcome-value ${depletionRow ? 'c-red' : 'c-green'}">${depletionRow ? 'Month ' + depletionRow.m : 'Not depleted'}</div></div>
-    <div class="outcome-card"><div class="outcome-label">Additional funding needed</div><div class="outcome-value ${additionalFunding > 0 ? 'c-red' : 'c-green'}">${additionalFunding > 0 ? fmt(additionalFunding) : 'None required'}</div></div>
-  `;
-
-  const labels = data.map(d => 'M' + d.m);
-  const chartDefaults = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } } },
-  };
-
-  if (c1) c1.destroy();
-  c1 = new Chart(document.getElementById('chart1'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Bank balance', data: data.map(d => d.balance), borderColor: '#4A90D9', backgroundColor: 'rgba(74,144,217,0.06)', fill: true, tension: 0.35, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2 },
-        { label: 'Gross burn', data: data.map(d => d.grossBurn), borderColor: '#E05252', borderDash: [5, 3], fill: false, tension: 0.2, pointRadius: 2, borderWidth: 1.5 },
-        { label: 'Revenue', data: data.map(d => d.revenue), borderColor: '#3DBE8C', borderDash: [3, 3], fill: false, tension: 0.2, pointRadius: 2, borderWidth: 1.5 },
-        { label: 'Net burn', data: data.map(d => d.netBurn), borderColor: '#C9A84C', borderDash: [2, 4], fill: false, tension: 0.2, pointRadius: 2, borderWidth: 1.5 }
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      scales: {
-        x: { ticks: { color: '#4E6880', font: { size: 11 } }, grid: { color: 'rgba(38,61,86,0.8)' } },
-        y: { ticks: { color: '#4E6880', font: { size: 11 }, callback: v => (v < 0 ? '-' : '') + 'RM ' + Math.abs(Math.round(v / 1000)) + 'k' }, grid: { color: 'rgba(38,61,86,0.8)' } }
-      }
-    }
-  });
-
-  if (c2) c2.destroy();
-  c2 = new Chart(document.getElementById('chart2'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Fixed-rent', data: data.map(d => d.totalFixed), backgroundColor: 'rgba(61,190,140,0.4)', borderColor: '#3DBE8C', borderWidth: 1, stack: 'units', yAxisID: 'y' },
-        { label: 'Rev-share', data: data.map(d => d.totalRS), backgroundColor: 'rgba(74,144,217,0.4)', borderColor: '#4A90D9', borderWidth: 1, stack: 'units', yAxisID: 'y' },
-        { label: 'Revenue', data: data.map(d => d.revenue), type: 'line', borderColor: '#C9A84C', backgroundColor: 'transparent', pointRadius: 2, fill: false, tension: 0.3, borderWidth: 2, yAxisID: 'y2' }
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      scales: {
-        x: { stacked: true, ticks: { color: '#4E6880', font: { size: 11 } }, grid: { display: false } },
-        y: { stacked: true, position: 'left', ticks: { color: '#4E6880', font: { size: 11 } }, grid: { color: 'rgba(38,61,86,0.8)' }, title: { display: true, text: 'Units', color: '#4E6880', font: { size: 11 } } },
-        y2: { position: 'right', ticks: { color: '#4E6880', font: { size: 11 }, callback: v => 'RM ' + Math.round(v / 1000) + 'k' }, grid: { display: false }, title: { display: true, text: 'Revenue', color: '#4E6880', font: { size: 11 } } }
-      }
-    }
-  });
-
-  let tbl = `<tr>
-    <th>Month</th><th>Total</th><th>Added</th><th>Fixed</th><th>RS</th>
-    <th>Capex</th><th>Incr. recurring</th><th>Gross burn</th>
-    <th>Revenue</th><th>Net burn</th><th>Balance</th><th>Occ%</th>
-  </tr>`;
-  data.forEach(d => {
-    const atTarget = d.totalUnits >= target && d.addedThisMonth === 0;
-    const rowCls = d.balance < 0 ? ' class="in-red"' : (atTarget ? ' class="at-target"' : '');
-    tbl += `<tr${rowCls}>
-      <td>M${d.m}</td>
-      <td>${d.totalUnits}</td>
-      <td>${d.addedThisMonth > 0 ? '+' + d.addedThisMonth : '—'}</td>
-      <td>${d.addedFixed > 0 ? d.addedFixed : '—'}</td>
-      <td>${d.addedRS > 0 ? d.addedRS : '—'}</td>
-      <td>${d.capex > 0 ? fmt(d.capex) : '—'}</td>
-      <td>${d.incrementalRecurring > 0 ? fmt(d.incrementalRecurring) : '—'}</td>
-      <td class="c-red">${fmt(d.grossBurn)}</td>
-      <td class="c-green">${fmt(d.revenue)}</td>
-      <td class="${d.netBurn > 0 ? 'c-red' : 'c-green'}">${fmt(d.netBurn)}</td>
-      <td class="${d.balance < 0 ? 'c-red' : ''}">${fmt(d.balance)}</td>
-      <td>${d.occ}%</td>
-    </tr>`;
-  });
-  document.getElementById('budget-table').innerHTML = tbl;
-}
-
-['sl-units', 'sl-target', 'sl-occ'].forEach(id => {
-  document.getElementById(id).addEventListener('input', render);
-});
-render();
-</script>
 </body>
 </html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blueground Malaysia — Financial Model</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f7f6f2; color: #1a1a1a; font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.6; min-height: 100vh; }
+  .header { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 2rem 2.5rem 1.75rem; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; }
+  .brand-name { font-size: 24px; font-weight: 500; color: #1a1a1a; letter-spacing: -0.01em; }
+  .brand-name span { color: #3B6D11; }
+  .brand-sub { font-size: 12px; color: #888; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 3px; }
+  .header-badge { background: #EAF3DE; border: 1px solid #97C459; color: #27500A; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; align-self: flex-start; }
+  .note-strip { background: #f5f5f2; border-left: 3px solid #97C459; border-radius: 0 6px 6px 0; padding: 10px 16px; font-size: 12px; color: #555; line-height: 1.75; }
+  .note-strip strong { color: #3B6D11; font-weight: 500; }
+  .main { max-width: 1200px; margin: 0 auto; padding: 2rem 2.5rem 4rem; }
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #aaa; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 0.5px; background: #e0e0da; }
+  hr.div { border: none; border-top: 1px solid #ececea; margin: 2rem 0; }
+  .sliders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+  .sl-card { background: #fff; border: 0.5px solid #e0e0da; border-radius: 10px; padding: 14px 16px; }
+  .sl-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .sl-val { font-size: 24px; font-weight: 500; color: #1a1a1a; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: #e8e8e4; border-radius: 2px; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #3B6D11; border: 2px solid #fff; box-shadow: 0 0 0 1px #3B6D11; }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #3B6D11; border: 2px solid #fff; }
+  .sl-range-labels { display: flex; justify-content: space-between; font-size: 10px; color: #bbb; margin-top: 5px; }
+  .banner { border-radius: 10px; padding: 16px 20px; margin-bottom: 1.5rem; border: 0.5px solid; }
+  .banner.profit { background: #EAF3DE; border-color: #97C459; }
+  .banner.loss { background: #FCEBEB; border-color: #F09595; }
+  .banner-title { font-size: 20px; font-weight: 500; margin-bottom: 5px; }
+  .banner-title.profit { color: #173404; }
+  .banner-title.loss { color: #501313; }
+  .banner-sub { font-size: 13px; color: #555; line-height: 1.65; }
+  .banner-sub strong { color: #173404; }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 2rem; }
+  .mc { background: #fff; border: 0.5px solid #e8e8e4; border-radius: 10px; padding: 14px 16px; }
+  .mc-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+  .mc-val { font-size: 17px; font-weight: 500; color: #1a1a1a; font-variant-numeric: tabular-nums; font-family: 'DM Mono', monospace; }
+  .chart-card { background: #fff; border: 0.5px solid #e8e8e4; border-radius: 12px; padding: 20px; margin-bottom: 1.25rem; }
+  .chart-card-title { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 3px; }
+  .chart-card-sub { font-size: 11px; color: #aaa; margin-bottom: 14px; }
+  .chart-wrap { position: relative; width: 100%; height: 300px; }
+  .chart-wrap-sm { position: relative; width: 100%; height: 200px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+  .li { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #666; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'DM Mono', monospace; }
+  th { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; padding: 8px 10px; text-align: right; border-bottom: 1px solid #ececea; white-space: nowrap; background: #fff; position: sticky; top: 0; }
+  th:first-child { text-align: left; }
+  td { padding: 6px 10px; text-align: right; border-bottom: 0.5px solid #f0f0ec; color: #333; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td:first-child { text-align: left; font-weight: 500; color: #1a1a1a; font-family: 'DM Sans', sans-serif; }
+  tr:hover td { background: #fafaf8; }
+  tr.profit-row td { background: #f4fbe9; color: #27500A; }
+  tr.be-row td { background: #C0DD97; color: #173404; font-weight: 500; }
+  tr.injection-row td { background: #EBF4FD; color: #042C53; }
+  tr.loss-row td { color: #791F1F; }
+  .inj-badge { font-size: 10px; background: #E6F1FB; color: #042C53; border-radius: 4px; padding: 1px 6px; margin-left: 5px; font-weight: 500; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .footer { border-top: 1px solid #e8e8e4; padding: 1.5rem 2.5rem; font-size: 11px; color: #bbb; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; background: #fff; }
+  @media (max-width: 640px) { .header, .main { padding-left: 1.25rem; padding-right: 1.25rem; } .brand-name { font-size: 20px; } .footer { padding: 1rem 1.25rem; } }
+</style>
+</head>
+<body>
+<div class="topbar-nav" style="background:#fff;border-bottom:1px solid #e8e8e4;padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;font-family:DM Sans,system-ui,sans-serif;"><div style="display:flex;align-items:center;gap:16px;"><a href="index.html" style="font-size:13px;color:#888;text-decoration:none;display:flex;align-items:center;gap:5px;">← Back</a><div style="width:1px;height:18px;background:#e4e4e0;"></div><span style="font-size:14px;font-weight:500;color:#1a1a1a;">Burn Rate &amp; Expansion Forecast</span></div><span style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#27500A;background:#EAF3DE;padding:3px 10px;border-radius:100px;">Live</span></div>
+
+<header class="header">
+  <div class="header-top">
+    <div>
+      <div class="brand-name">Blueground <span>Malaysia</span></div>
+      <div class="brand-sub">Blueground (M) Sdn Bhd · Mid-Term Rental Portfolio</div>
+    </div>
+    <div class="header-badge">Financial Model · Confidential</div>
+  </div>
+  <div class="note-strip">
+    Base: <strong>23 units</strong>, starting balance <strong>RM 235,000</strong>. Revenue from 21 units = <strong>RM 70,000/mo</strong> (RM 3,333/unit); 2 newly added units start earning month 1.
+    Revenue ramps toward <strong>rent ×1.20 + utilities ×1.30</strong> at maturity. New fixed-rent units earn at <strong>10% markup</strong> (months 1–2), <strong>20%</strong> (month 3), <strong>30%</strong> (month 4+).
+    Base burn <strong>RM 119,224</strong> + RM 4,000/mo per new fixed-rent unit + RM 500/mo per new rev-share unit + <strong>5% staffing uplift per 20 new units</strong>.
+    For every 10 fixed-rent units added, <strong>3 rev-share units</strong> are added. Capex per new fixed-rent unit = deposit + advance + setup = <strong>RM 16,750</strong>; rev-share = setup only <strong>RM 8,000</strong>.
+    Cash injections of <strong>RM 380,000</strong> then <strong>RM 1,000,000</strong> trigger automatically when balance drops below RM 50,000.
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="section-label">Parameters</div>
+  <div class="sliders-grid">
+    <div class="sl-card">
+      <div class="sl-label">Units added per month</div>
+      <div class="sl-val" id="v-upm">6</div>
+      <input type="range" min="1" max="20" value="6" step="1" id="sl-upm">
+      <div class="sl-range-labels"><span>1</span><span>20</span></div>
+    </div>
+    <div class="sl-card">
+      <div class="sl-label">Occupancy at maturity (%)</div>
+      <div class="sl-val" id="v-occ">80%</div>
+      <input type="range" min="65" max="95" value="80" step="1" id="sl-occ">
+      <div class="sl-range-labels"><span>65%</span><span>95%</span></div>
+    </div>
+    <div class="sl-card">
+      <div class="sl-label">Months to revenue maturity</div>
+      <div class="sl-val" id="v-ramp">12</div>
+      <input type="range" min="4" max="24" value="12" step="1" id="sl-ramp">
+      <div class="sl-range-labels"><span>4 mo</span><span>24 mo</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Result</div>
+  <div id="banner"></div>
+  <div class="metrics" id="metrics"></div>
+
+  <hr class="div">
+
+  <div class="section-label">Monthly profit / loss and bank balance</div>
+  <div class="chart-card">
+    <div class="chart-card-title">Net P/L per month (bars) and bank balance (line)</div>
+    <div class="chart-card-sub">Blue vertical dashed lines mark cash injection months</div>
+    <div class="legend">
+      <span class="li"><span class="sw" style="background:#97C459;"></span>Monthly profit</span>
+      <span class="li"><span class="sw" style="background:#F09595;"></span>Monthly loss</span>
+      <span class="li"><span class="sw" style="background:#378ADD;"></span>Bank balance</span>
+    </div>
+    <div class="chart-wrap"><canvas id="c1" role="img" aria-label="Bar chart of monthly profit and loss with bank balance line and cash injection markers">Monthly profit/loss and bank balance.</canvas></div>
+  </div>
+
+  <div class="section-label">Revenue vs gross burn</div>
+  <div class="chart-card">
+    <div class="chart-card-title">Revenue (actual ramp) vs gross burn vs mature revenue potential</div>
+    <div class="legend">
+      <span class="li"><span class="sw" style="background:#639922;"></span>Revenue (actual ramp)</span>
+      <span class="li"><span class="sw" style="background:#E24B4A;"></span>Gross burn (inc. capex)</span>
+      <span class="li"><span class="sw" style="background:#BA7517;"></span>Mature revenue potential</span>
+    </div>
+    <div class="chart-wrap-sm"><canvas id="c2" role="img" aria-label="Line chart of revenue crossing over gross burn as units expand">Revenue vs gross burn crossover.</canvas></div>
+  </div>
+
+  <div class="section-label">Portfolio growth</div>
+  <div class="chart-card">
+    <div class="chart-card-title">Fixed-rent and rev-share unit count over time</div>
+    <div class="legend">
+      <span class="li"><span class="sw" style="background:rgba(59,109,17,0.7);"></span>Fixed-rent units</span>
+      <span class="li"><span class="sw" style="background:rgba(24,95,165,0.6);"></span>Rev-share units</span>
+    </div>
+    <div class="chart-wrap-sm"><canvas id="c3" role="img" aria-label="Stacked bar chart of fixed-rent and rev-share unit counts growing each month">Portfolio growth by unit type.</canvas></div>
+  </div>
+
+  <hr class="div">
+
+  <div class="section-label">Month-by-month detail</div>
+  <div class="table-wrap"><table id="tbl"></table></div>
+
+</main>
+
+<footer class="footer">
+  <span>Blueground (M) Sdn Bhd — Internal Financial Model</span>
+  <span>For shareholder review only · Confidential</span>
+</footer>
+
+<script>
+const BASE_UNITS = 23;
+const BASE_BURN = 119224;
+const STARTING_BALANCE = 235000;
+const BASE_OCC = 0.65;
+const RENT_NEW = 3500;
+const UTIL_NEW = 500;
+const DEPOSIT = 1.5 * RENT_NEW;
+const ADV_RENTAL = RENT_NEW;
+const SETUP = 8000;
+const INJECTION_1 = 380000;
+const INJECTION_2 = 1000000;
+const INJECTION_TRIGGER = 50000;
+const MAX_UNITS = 200;
+
+function fmt(n) {
+  const a = Math.abs(Math.round(n));
+  return (n < 0 ? '-' : '') + 'RM ' + a.toLocaleString();
+}
+function fmtK(n) {
+  const a = Math.abs(Math.round(n / 1000));
+  return (n < 0 ? '-' : '') + 'RM ' + a + 'k';
+}
+function markup(age) {
+  if (age <= 2) return 0.10;
+  if (age === 3) return 0.20;
+  return 0.30;
+}
+
+function computeModel(upm, occTarget, rampMonths) {
+  const rows = [];
+  let balance = STARTING_BALANCE;
+  let totalFixed = BASE_UNITS;
+  let totalRS = 0;
+  let totalUnits = BASE_UNITS;
+  const targetOcc = occTarget / 100;
+  const injections = [INJECTION_1, INJECTION_2];
+  let injIdx = 0;
+  let beMonth = null;
+  let profitStreak = 0;
+  const cohorts = [];
+  for (let i = 0; i < 21; i++) cohorts.push({ type: 'existing', age: 0, earning: true });
+  for (let i = 0; i < 2; i++) cohorts.push({ type: 'existing', age: 0, earning: false });
+  const MAX_MONTHS = 48;
+
+  for (let m = 1; m <= MAX_MONTHS; m++) {
+    const addThisMonth = (totalUnits < MAX_UNITS) ? Math.min(upm, MAX_UNITS - totalUnits) : 0;
+    const addFixed = Math.round(addThisMonth * (10 / 13));
+    const addRS = addThisMonth - addFixed;
+    const capex = addFixed * (DEPOSIT + ADV_RENTAL + SETUP) + addRS * SETUP;
+    const incrRecurring = (totalFixed - BASE_UNITS) * (RENT_NEW + UTIL_NEW) + totalRS * UTIL_NEW;
+    const staffTiers = Math.floor((totalUnits - BASE_UNITS) / 20);
+    const staffMult = 1 + staffTiers * 0.05;
+    const grossBurn = BASE_BURN * staffMult + incrRecurring + capex;
+    const occNow = Math.min(targetOcc, BASE_OCC + (targetOcc - BASE_OCC) * (m / Math.max(rampMonths, 1)));
+
+    cohorts.forEach(c => {
+      if (c.earning) { c.age++; }
+      else { c.earning = true; c.age = 1; }
+    });
+
+    let revenue = 0;
+    cohorts.forEach(c => {
+      const t = Math.min(c.age / rampMonths, 1);
+      if (c.type === 'existing') {
+        const revPerUnit = 3333 + (RENT_NEW * 1.20 + UTIL_NEW * 1.30 - 3333) * t;
+        revenue += revPerUnit * (occNow / BASE_OCC);
+      } else if (c.type === 'fixed') {
+        const mk = markup(c.age);
+        revenue += (RENT_NEW * (1 + mk) + UTIL_NEW * (1 + mk)) * occNow;
+      } else {
+        const mk = markup(c.age);
+        revenue += UTIL_NEW * (1 + mk) * occNow;
+      }
+    });
+    revenue = Math.round(revenue);
+
+    const matureRev = Math.round(
+      23 * (RENT_NEW * 1.20 + UTIL_NEW * 1.30) * (occNow / BASE_OCC) +
+      (totalFixed - BASE_UNITS) * (RENT_NEW * 1.20 + UTIL_NEW * 1.30) * occNow +
+      totalRS * (UTIL_NEW * 1.30) * occNow
+    );
+
+    const netPL = revenue - grossBurn;
+    balance += netPL;
+
+    let injection = 0;
+    let injLabel = '';
+    if (balance < INJECTION_TRIGGER && injIdx < injections.length) {
+      injection = injections[injIdx];
+      injLabel = injIdx === 0 ? 'RM 380k injection' : 'RM 1M injection';
+      balance += injection;
+      injIdx++;
+    }
+
+    if (netPL >= 0) {
+      profitStreak++;
+      if (profitStreak === 1 && beMonth === null) beMonth = m;
+    } else {
+      profitStreak = 0;
+      beMonth = null;
+    }
+
+    rows.push({
+      m, totalUnits, addThisMonth, addFixed, addRS,
+      totalFixed, totalRS,
+      capex: Math.round(capex),
+      staffPct: Math.round(staffMult * 100),
+      grossBurn: Math.round(grossBurn),
+      revenue, matureRev,
+      netPL: Math.round(netPL),
+      balance: Math.round(balance),
+      occ: Math.round(occNow * 100),
+      injection, injLabel,
+      isFirstProfit: profitStreak === 1 && netPL >= 0
+    });
+
+    for (let i = 0; i < addFixed; i++) cohorts.push({ type: 'fixed', age: 0, earning: false });
+    for (let i = 0; i < addRS; i++) cohorts.push({ type: 'rs', age: 0, earning: false });
+    totalFixed += addFixed;
+    totalRS += addRS;
+    totalUnits += addThisMonth;
+    if (profitStreak >= 3 && m > 8 && totalUnits >= MAX_UNITS) break;
+  }
+  return rows;
+}
+
+let c1i = null, c2i = null, c3i = null;
+
+function render() {
+  const upm = parseInt(document.getElementById('sl-upm').value);
+  const occ = parseInt(document.getElementById('sl-occ').value);
+  const ramp = parseInt(document.getElementById('sl-ramp').value);
+  document.getElementById('v-upm').textContent = upm;
+  document.getElementById('v-occ').textContent = occ + '%';
+  document.getElementById('v-ramp').textContent = ramp;
+
+  const data = computeModel(upm, occ, ramp);
+  const firstProfit = data.find(d => d.netPL >= 0);
+  const inj1Row = data.find(d => d.injLabel.includes('380k'));
+  const inj2Row = data.find(d => d.injLabel.includes('1M'));
+  const minBal = Math.min(...data.map(d => d.balance));
+  const lastRow = data[data.length - 1];
+
+  const b = document.getElementById('banner');
+  if (firstProfit) {
+    b.innerHTML = '<div class="banner profit"><div class="banner-title profit">Breakeven at month ' + firstProfit.m + ' \u2014 ' + firstProfit.totalUnits + ' units</div><div class="banner-sub">Portfolio turns cash-flow positive at <strong>' + firstProfit.totalUnits + ' units</strong> with <strong>' + firstProfit.occ + '% occupancy</strong>. First monthly profit: <strong>' + fmt(firstProfit.netPL) + '</strong>. End-of-model monthly profit: <strong>' + fmt(lastRow.netPL) + '/mo</strong> across <strong>' + lastRow.totalUnits + ' units</strong>.</div></div>';
+  } else {
+    b.innerHTML = '<div class="banner loss"><div class="banner-title loss">Breakeven not reached within model window</div><div class="banner-sub">Try increasing units per month or occupancy target using the sliders above.</div></div>';
+  }
+
+  document.getElementById('metrics').innerHTML =
+    '<div class="mc"><div class="mc-label">Breakeven month</div><div class="mc-val" style="color:' + (firstProfit ? '#3B6D11' : '#A32D2D') + '">' + (firstProfit ? 'Month ' + firstProfit.m : 'N/A') + '</div></div>' +
+    '<div class="mc"><div class="mc-label">Units at breakeven</div><div class="mc-val">' + (firstProfit ? firstProfit.totalUnits : '—') + '</div></div>' +
+    '<div class="mc"><div class="mc-label">1st injection (RM 380k)</div><div class="mc-val" style="color:#185FA5">' + (inj1Row ? 'Month ' + inj1Row.m : 'Not needed') + '</div></div>' +
+    '<div class="mc"><div class="mc-label">2nd injection (RM 1M)</div><div class="mc-val" style="color:#185FA5">' + (inj2Row ? 'Month ' + inj2Row.m : 'Not needed') + '</div></div>' +
+    '<div class="mc"><div class="mc-label">Lowest balance</div><div class="mc-val" style="color:' + (minBal < 0 ? '#A32D2D' : '#3B6D11') + '">' + fmtK(minBal) + '</div></div>' +
+    '<div class="mc"><div class="mc-label">End monthly profit</div><div class="mc-val" style="color:' + (lastRow.netPL >= 0 ? '#3B6D11' : '#A32D2D') + '">' + fmtK(lastRow.netPL) + '/mo</div></div>';
+
+  const labels = data.map(d => 'M' + d.m);
+
+  const injPlugin = {
+    id: 'injLines',
+    beforeDraw(chart) {
+      const ctx = chart.ctx;
+      const xAxis = chart.scales.x;
+      data.forEach((d, i) => {
+        if (d.injection > 0) {
+          const x = xAxis.getPixelForValue(i);
+          ctx.save();
+          ctx.strokeStyle = '#378ADD';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 3]);
+          ctx.beginPath();
+          ctx.moveTo(x, chart.chartArea.top);
+          ctx.lineTo(x, chart.chartArea.bottom);
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+    }
+  };
+
+  if (c1i) c1i.destroy();
+  c1i = new Chart(document.getElementById('c1'), {
+    type: 'bar',
+    plugins: [injPlugin],
+    data: {
+      labels,
+      datasets: [
+        { label: 'Profit', data: data.map(d => d.netPL >= 0 ? d.netPL : null), backgroundColor: '#97C459', borderColor: '#3B6D11', borderWidth: 1, yAxisID: 'y' },
+        { label: 'Loss', data: data.map(d => d.netPL < 0 ? d.netPL : null), backgroundColor: '#F09595', borderColor: '#E24B4A', borderWidth: 1, yAxisID: 'y' },
+        { label: 'Balance', data: data.map(d => d.balance), type: 'line', borderColor: '#378ADD', backgroundColor: 'transparent', fill: false, tension: 0.35, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2, borderDash: [4, 2], yAxisID: 'y2' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ' ' + fmt(ctx.parsed.y); } } } },
+      scales: {
+        x: { ticks: { autoSkip: true, maxRotation: 0, font: { size: 11 }, color: '#aaa' }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        y: { position: 'left', ticks: { font: { size: 11 }, color: '#aaa', callback: function(v) { return (v < 0 ? '-' : '') + 'RM ' + Math.abs(Math.round(v / 1000)) + 'k'; } }, grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'P/L (RM)', color: '#ccc', font: { size: 10 } } },
+        y2: { position: 'right', ticks: { font: { size: 11 }, color: '#aaa', callback: function(v) { return (v < 0 ? '-' : '') + 'RM ' + Math.abs(Math.round(v / 1000)) + 'k'; } }, grid: { display: false }, title: { display: true, text: 'Balance (RM)', color: '#ccc', font: { size: 10 } } }
+      }
+    }
+  });
+
+  if (c2i) c2i.destroy();
+  c2i = new Chart(document.getElementById('c2'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Revenue', data: data.map(d => d.revenue), borderColor: '#639922', backgroundColor: 'rgba(99,153,34,0.07)', fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2 },
+        { label: 'Gross burn', data: data.map(d => d.grossBurn), borderColor: '#E24B4A', borderDash: [5, 3], fill: false, tension: 0.2, pointRadius: 2, borderWidth: 1.5 },
+        { label: 'Mature revenue', data: data.map(d => d.matureRev), borderColor: '#BA7517', borderDash: [3, 4], fill: false, tension: 0.2, pointRadius: 0, borderWidth: 1.5 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ' ' + fmt(ctx.parsed.y); } } } },
+      scales: {
+        x: { ticks: { autoSkip: true, maxRotation: 0, font: { size: 11 }, color: '#aaa' }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        y: { ticks: { font: { size: 11 }, color: '#aaa', callback: function(v) { return 'RM ' + Math.round(v / 1000) + 'k'; } }, grid: { color: 'rgba(0,0,0,0.04)' } }
+      }
+    }
+  });
+
+  if (c3i) c3i.destroy();
+  c3i = new Chart(document.getElementById('c3'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Fixed-rent', data: data.map(d => d.totalFixed), backgroundColor: 'rgba(59,109,17,0.55)', borderColor: '#3B6D11', borderWidth: 1, stack: 'u' },
+        { label: 'Rev-share', data: data.map(d => d.totalRS), backgroundColor: 'rgba(24,95,165,0.45)', borderColor: '#185FA5', borderWidth: 1, stack: 'u' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { stacked: true, ticks: { autoSkip: true, maxRotation: 0, font: { size: 11 }, color: '#aaa' }, grid: { display: false } },
+        y: { stacked: true, ticks: { font: { size: 11 }, color: '#aaa' }, grid: { color: 'rgba(0,0,0,0.04)' } }
+      }
+    }
+  });
+
+  var tbl = '<tr><th>Month</th><th>Units</th><th>Added</th><th>Overhead</th><th>Gross burn</th><th>Revenue</th><th>Net P/L</th><th>Balance</th><th>Occ%</th></tr>';
+  data.forEach(function(d) {
+    var hasInj = d.injection > 0;
+    var rowCls = hasInj ? 'injection-row' : (d.isFirstProfit ? 'be-row' : (d.netPL >= 0 ? 'profit-row' : 'loss-row'));
+    var injBadge = hasInj ? '<span class="inj-badge">' + d.injLabel + '</span>' : '';
+    tbl += '<tr class="' + rowCls + '"><td>M' + d.m + injBadge + '</td><td>' + d.totalUnits + '</td><td>' + (d.addThisMonth > 0 ? '+' + d.addThisMonth : '—') + '</td><td>' + d.staffPct + '%</td><td>' + fmt(d.grossBurn) + '</td><td>' + fmt(d.revenue) + '</td><td>' + fmt(d.netPL) + '</td><td>' + fmt(d.balance) + '</td><td>' + d.occ + '%</td></tr>';
+  });
+  document.getElementById('tbl').innerHTML = tbl;
+}
+
+['sl-upm', 'sl-occ', 'sl-ramp'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', render);
+});
+render();
+</script>
+</body>
+</html>
