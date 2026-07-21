@@ -3,111 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blueground Malaysia — Internal Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<title>Blueground (M) Sdn. Bhd.</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #f7f6f2; color: #1a1a1a; font-family: 'DM Sans', system-ui, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
-
-  .topbar { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
-  .topbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-  .topbar-dot { width: 10px; height: 10px; border-radius: 50%; background: #3B6D11; }
-  .topbar-name { font-size: 15px; font-weight: 500; color: #1a1a1a; letter-spacing: -0.01em; }
-  .topbar-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; background: #f0f0ec; padding: 3px 10px; border-radius: 100px; }
-
-  .hero { background: #fff; border-bottom: 1px solid #e8e8e4; padding: 4rem 2.5rem 3.5rem; text-align: center; }
-  .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #3B6D11; margin-bottom: 1rem; }
-  .hero-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 42px; font-weight: 400; color: #1a1a1a; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
-  .hero-sub { font-size: 15px; color: #888; max-width: 480px; margin: 0 auto; line-height: 1.7; }
-
-  .main { max-width: 860px; margin: 0 auto; padding: 3rem 2rem 5rem; flex: 1; width: 100%; }
-
-  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin: 0 0 16px; display: flex; align-items: center; gap: 8px; }
-  .section-label::after { content: ''; flex: 1; height: 0.5px; background: #e4e4e0; }
-
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 3rem; }
-
-  .card { background: #fff; border: 0.5px solid #e4e4e0; border-radius: 14px; padding: 24px 26px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
-  .card:hover { border-color: #97C459; box-shadow: 0 2px 16px rgba(59,109,17,0.08); }
-  .card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-  .card-icon.green { background: #EAF3DE; }
-  .card-icon.blue { background: #E6F1FB; }
-  .card-icon.amber { background: #FAEEDA; }
-  .card-icon.placeholder { background: #f5f5f2; }
-  .card-tag { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 100px; display: inline-flex; align-self: flex-start; }
-  .card-tag.live { background: #EAF3DE; color: #27500A; }
-  .card-tag.wip { background: #FAEEDA; color: #633806; }
-  .card-tag.soon { background: #f0f0ec; color: #888; }
-  .card-title { font-size: 16px; font-weight: 500; color: #1a1a1a; line-height: 1.3; }
-  .card-desc { font-size: 13px; color: #888; line-height: 1.65; }
-  .card-arrow { font-size: 18px; color: #ccc; align-self: flex-end; margin-top: auto; transition: color 0.15s, transform 0.15s; }
-  .card:hover .card-arrow { color: #3B6D11; transform: translateX(3px); }
-  .card.disabled { pointer-events: none; opacity: 0.6; }
-
-  .info-strip { background: #fff; border: 0.5px solid #e4e4e0; border-radius: 10px; padding: 14px 18px; font-size: 12px; color: #999; line-height: 1.7; display: flex; gap: 10px; align-items: flex-start; }
-  .info-dot { width: 6px; height: 6px; border-radius: 50%; background: #3B6D11; margin-top: 6px; flex-shrink: 0; }
-
-  .footer { border-top: 1px solid #e8e8e4; padding: 1.25rem 2.5rem; font-size: 11px; color: #ccc; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; background: #fff; }
-
-  @media (max-width: 600px) {
-    .topbar { padding: 0 1.25rem; }
-    .hero { padding: 3rem 1.25rem 2.5rem; }
-    .hero-title { font-size: 30px; }
-    .main { padding: 2rem 1.25rem 4rem; }
-    .footer { padding: 1rem 1.25rem; }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:#fcfcfb;
+    color:#16140f;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  header.banner{
+    background:#ffffff;
+    border-bottom:1px solid #e6e4da;
+    padding:20px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  header.banner img{
+    height:54px;
+    width:auto;
+    display:block;
+  }
+  header.banner .company-name{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size:20px;
+    font-weight:700;
+    color:#273655;
+    letter-spacing:.01em;
+  }
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:64px 24px 48px;
+  }
+  main h1{
+    text-align:center;
+    font-size:24px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    color:#16140f;
+    margin:0 0 48px;
+  }
+  .link-list{
+    display:flex;
+    flex-direction:column;
+  }
+  .link-list a{
+    display:block;
+    background:#ffffff;
+    border:1px solid #d8d4c6;
+    border-radius:10px;
+    padding:20px 24px;
+    margin-bottom:22px;
+    text-decoration:none;
+    color:#16140f;
+    font-family: Arial, sans-serif;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+  }
+  .link-list a:hover{
+    border-color:#1b4f8a;
+    box-shadow:0 2px 10px rgba(27,79,138,0.12);
+    transform:translateY(-1px);
+  }
+  .link-list .link-num{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    color:#1b4f8a;
+    letter-spacing:.08em;
+    margin-bottom:4px;
+  }
+  .link-list .link-title{
+    display:block;
+    font-size:17px;
+    font-weight:700;
+    color:#1b4f8a;
+    margin-bottom:4px;
+  }
+  .link-list .link-sub{
+    display:block;
+    font-size:13px;
+    color:#55524a;
+    line-height:1.5;
+  }
+  .link-list .link-sub-ru{
+    display:block;
+    font-size:13px;
+    color:#55524a;
+    line-height:1.5;
+    font-style:italic;
+    margin-top:2px;
+  }
+  .disclaimer{
+    max-width:640px;
+    margin:8px auto 0;
+    padding:16px 24px 0;
+    font-family: Arial, sans-serif;
+    font-size:11.5px;
+    line-height:1.6;
+    color:#8a8578;
+    text-align:center;
+    border-top:1px solid #e6e4da;
+  }
+  .disclaimer b{ color:#7a7768; }
+  footer{
+    text-align:center;
+    padding:6px 24px 40px;
+    font-family: Arial, sans-serif;
+    font-size:11.5px;
+    color:#8a8578;
+  }
+  @media (max-width:520px){
+    header.banner{ padding:16px 20px; }
+    header.banner .company-name{ font-size:16px; }
+    header.banner img{ height:42px; }
+    main{ padding:40px 18px 32px; }
+    main h1{ font-size:20px; margin-bottom:36px; }
   }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <a class="topbar-brand" href="index.html">
-    <div class="topbar-dot"></div>
-    <span class="topbar-name">Blueground Malaysia</span>
-  </a>
-  <span class="topbar-badge">Internal Portal</span>
-</div>
+<header class="banner">
+  <img src="BG_Logo_Blue_Horizontal.jpg" alt="Blueground">
+  <div class="company-name">Blueground (M) Sdn. Bhd.</div>
+</header>
 
-<div class="hero">
-  <div class="hero-eyebrow">Blueground (M) Sdn Bhd</div>
-  <h1 class="hero-title">Internal Dashboard</h1>
-  <p class="hero-sub">Financial models, forecasts, and operational reports for internal and shareholder use.</p>
-</div>
+<main>
+  <h1>Analyst Reports &amp; Breakeven Calculator</h1>
 
-<main class="main">
-
-  <div class="section-label">Financial reports</div>
-  <div class="cards">
-
-    <a class="card" href="forecast.html">
-      <div class="card-icon green">📈</div>
-      <span class="card-tag live">Live</span>
-      <div class="card-title">Burn Rate &amp; Expansion Forecast</div>
-      <div class="card-desc">Interactive model showing monthly burn, revenue ramp, cash injections, breakeven point, and portfolio growth up to 200 units.</div>
-      <div class="card-arrow">→</div>
+  <div class="link-list">
+    <a href="breakeven-model-and-risk-assessment.html">
+      <span class="link-num">1</span>
+      <span class="link-title">Breakeven Model &amp; Risk Assessment</span>
+      <span class="link-sub">Current position, liquidity risk, and the case for the Wthr takeover.</span>
+      <span class="link-sub-ru">Текущее положение, риск ликвидности и обоснование перехода к Wthr.</span>
     </a>
-
-    <a class="card" href="expenses.html">
-      <div class="card-icon amber">📋</div>
-      <span class="card-tag wip">In progress</span>
-      <div class="card-title">Monthly Fixed &amp; Variable Expenses</div>
-      <div class="card-desc">Detailed breakdown of recurring fixed costs and variable operating expenses across the portfolio.</div>
-      <div class="card-arrow">→</div>
+    <a href="business-roadmap.html">
+      <span class="link-num">2</span>
+      <span class="link-title">Business Roadmap &amp; Capital Plan</span>
+      <span class="link-sub">The adopted growth plan, tranche schedule, and path to breakeven.</span>
+      <span class="link-sub-ru">Принятый план роста, график траншей и путь к безубыточности.</span>
     </a>
-
+    <a href="gm-monthly-playbook.html">
+      <span class="link-num">3</span>
+      <span class="link-title">General Manager's Monthly Business Playbook</span>
+      <span class="link-sub">Month-by-month operating targets for the General Manager and shareholders.</span>
+      <span class="link-sub-ru">Ежемесячные операционные ориентиры для генерального директора и акционеров.</span>
+    </a>
+    <a href="breakeven-calculator.html">
+      <span class="link-num">4</span>
+      <span class="link-title">Breakeven Calculator</span>
+      <span class="link-sub">Interactive model &mdash; test alternative assumptions on occupancy, margin, growth rate, and capital structure.</span>
+      <span class="link-sub-ru">Интерактивная модель &mdash; проверьте альтернативные допущения по загрузке, марже, темпу роста и структуре капитала.</span>
+    </a>
   </div>
-
-  <div class="info-strip">
-    <div class="info-dot"></div>
-    <span>This portal is for internal use and shareholder review only. All data is confidential. Additional pages will be added as they are completed. For access queries, contact the finance team.</span>
-  </div>
-
 </main>
 
-<footer class="footer">
-  <span>Blueground (M) Sdn Bhd — Internal Portal</span>
-  <span>Confidential · Not for public distribution</span>
-</footer>
+<p class="disclaimer"><b>Disclaimer:</b> The reports and calculator linked from this page are prepared solely for internal analysis and planning purposes. All figures and projections shown are assumptions used specifically to model the business and capital plan of Blueground (M) Sdn. Bhd., and do not reflect actual data or results from Blueground's operations in any other country. Nothing in these reports or the calculator should be treated as a statement of fact, or relied upon as evidence, regarding Blueground (M) Sdn. Bhd. or Blueground in any other jurisdiction.</p>
+
+<footer>Copyright (c) Blueground (M) Sdn. Bhd.</footer>
 
 </body>
 </html>

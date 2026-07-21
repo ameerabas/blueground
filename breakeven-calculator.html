@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blueground (M) Sdn. Bhd - Breakeven Calculator</title>
+<style>
+  :root{
+    --page:#ffffff;
+    --surface-1:#fcfcfb;
+    --surface-2:#f5f5f2;
+    --text-primary:#0b0b0b;
+    --text-secondary:#52514e;
+    --muted:#898781;
+    --grid:#e1e0d9;
+    --baseline:#c3c2b7;
+    --border:rgba(11,11,11,0.10);
+    --series-1:#2a78d6; /* blue - revenue / furnished */
+    --series-2:#1baf7a; /* aqua - unfurnished */
+    --series-3:#eda100; /* yellow */
+    --series-4:#008300; /* green - net profit */
+    --series-8:#eb6834; /* orange - costs */
+    --good:#006300;
+    --critical:#d03b3b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--page);
+    color:var(--text-primary);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:14px;
+    line-height:1.45;
+  }
+  header.topbar{
+    position:sticky; top:0; z-index:50;
+    background:#ffffff;
+    border-bottom:1px solid var(--border);
+    padding:14px 24px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  }
+  header.topbar h1{
+    font-size:18px; margin:0; font-weight:700; letter-spacing:-0.01em;
+  }
+  header.topbar .sub{ color:var(--text-secondary); font-size:12px; margin-top:2px; }
+  header.topbar .topbar-actions{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  header.topbar .site-home{
+    font-family: Arial, sans-serif; font-size:12.5px; font-weight:700; color:#1b4f8a;
+    text-decoration:none; letter-spacing:.02em;
+  }
+  header.topbar .site-home:hover{ text-decoration:underline; }
+  .rate-section{
+    background:var(--surface-1); border:1px solid var(--border); border-radius:10px;
+    padding:14px 20px; margin-bottom:20px;
+  }
+  .rate-box{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  .rate-box label{ font-size:12px; color:var(--text-secondary); font-weight:600; }
+  .rate-box input{
+    width:100px; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:14px;
+    font-variant-numeric:tabular-nums;
+  }
+  .rate-box .rate-note{ font-size:11px; color:var(--muted); }
+  button{
+    font-family:inherit; cursor:pointer; border-radius:6px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-primary); padding:7px 12px; font-size:12px; font-weight:600;
+    line-height:1.4;
+  }
+  button:hover{ background:#ececea; }
+  button.primary{ background:var(--series-1); color:white; border-color:var(--series-1); }
+  button.primary:hover{ background:#2568bd; }
+
+  /* --- Bilingual (EN/RU) helpers --- */
+  .i18n-ru{ display:block; }
+  .field-label-ru{ font-size:12px; font-weight:600; color:var(--text-primary); margin-top:-2px; }
+  .hint-ru{ font-size:11px; color:var(--muted); margin-top:-2px; }
+  .kpi-card .label .i18n-ru{ margin-top:1px; }
+  details.card summary .summary-bi{ display:flex; flex-direction:column; gap:1px; }
+
+  main{ max-width:1560px; margin:0 auto; padding:20px 24px 60px; }
+
+  section{ margin-bottom:28px; }
+  section > h2{
+    font-size:15px; margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--grid);
+  }
+
+  .kpi-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px;
+  }
+  .kpi-card{
+    background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:14px 16px;
+  }
+  .kpi-card .label{ font-size:11px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+  .kpi-card .value{ font-size:20px; font-weight:700; margin-top:4px; font-variant-numeric:tabular-nums; }
+  .kpi-card .value.good{ color:var(--good); }
+  .kpi-card .value.bad{ color:var(--critical); }
+  .kpi-card .usd{ font-size:11px; color:var(--muted); margin-top:2px; font-variant-numeric:tabular-nums; }
+  .kpi-card input[type=number]{
+    font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; width:100%;
+    border:1px solid var(--border); border-radius:6px; padding:4px 8px; margin-top:5px;
+    color:var(--text-primary); background:var(--page); font-family:inherit;
+  }
+
+  .input-groups{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(360px,1fr)); gap:14px;
+  }
+  details.card{
+    background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:0;
+  }
+  details.card summary{
+    cursor:pointer; padding:12px 16px; font-weight:700; font-size:13px; list-style:none;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  details.card summary::-webkit-details-marker{ display:none; }
+  details.card summary::after{ content:'▾'; color:var(--series-1); font-size:20px; font-weight:700; line-height:1; transition:transform .15s; }
+  details.card[open] summary::after{ transform:rotate(180deg); }
+  details.card .card-body{ padding:2px 16px 16px; display:flex; flex-direction:column; gap:12px; }
+
+  .field{ display:flex; flex-direction:column; gap:4px; }
+  .field .field-label{ font-size:12px; font-weight:600; color:var(--text-primary); display:flex; justify-content:space-between; gap:8px; }
+  .field .field-label .val{ color:var(--series-1); font-variant-numeric:tabular-nums; font-weight:700; }
+  .field .hint{ font-size:11px; color:var(--muted); }
+  .field input[type=number]{
+    padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; width:100%;
+    font-variant-numeric:tabular-nums;
+  }
+  .field input[type=range]{ width:100%; accent-color:var(--series-1); }
+  .field-row{ display:flex; gap:10px; }
+  .field-row .field{ flex:1; }
+  .rm-prefix{ position:relative; }
+  .rm-prefix span{ position:absolute; left:8px; top:6px; font-size:12px; color:var(--muted); pointer-events:none; }
+  .rm-prefix input[type=number]{ padding-left:32px; }
+
+  table{ border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; font-size:12.5px; }
+  .table-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:10px; background:var(--surface-1); }
+  thead th{
+    position:sticky; top:0; background:var(--surface-2); text-align:right; padding:8px 10px;
+    border-bottom:1px solid var(--grid); white-space:nowrap; font-size:11px; color:var(--text-secondary);
+  }
+  thead th:first-child, tbody td:first-child{ text-align:left; position:sticky; left:0; background:var(--surface-2); z-index:2; }
+  tbody td:first-child{ background:var(--surface-1); font-weight:700; }
+  tbody tr.breakeven td{ background:#eafaea; }
+  tbody tr.breakeven td:first-child{ background:#dff3df; }
+  tbody td{ padding:7px 10px; text-align:right; border-bottom:1px solid var(--grid); white-space:nowrap; }
+  td .myr{ font-weight:600; }
+  td .usd{ display:block; color:var(--muted); font-size:10.5px; font-weight:400; }
+  td.pos{ color:var(--good); }
+  td.neg{ color:var(--critical); }
+  tbody tr:hover td{ background:#f2f2ef; }
+  tbody tr.breakeven:hover td{ background:#dff3df; }
+
+  .chart-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
+  .chart-card{ background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:14px 16px 8px; position:relative; }
+  .chart-card h3{ font-size:13px; margin:0 0 2px; }
+  .chart-card .chart-sub{ font-size:11px; color:var(--muted); margin-bottom:6px; }
+  .legend{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:4px; font-size:11.5px; }
+  .legend .item{ display:flex; align-items:center; gap:6px; color:var(--text-secondary); font-weight:600; }
+  .legend .dot{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+  .chart-svg-wrap{ position:relative; }
+  svg.chart text{ fill:var(--muted); font-size:10px; font-family:inherit; }
+  svg.chart .gridline{ stroke:var(--grid); stroke-width:1; }
+  svg.chart .baseline{ stroke:var(--baseline); stroke-width:1; }
+  svg.chart .crosshair{ stroke:var(--muted); stroke-width:1; stroke-dasharray:3,3; display:none; }
+  .tooltip{
+    position:absolute; pointer-events:none; background:#0b0b0b; color:#fff; padding:8px 10px; border-radius:6px;
+    font-size:11px; line-height:1.5; display:none; z-index:10; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,.2);
+  }
+  .tooltip .t-month{ font-weight:700; margin-bottom:3px; }
+  .tooltip .t-row{ display:flex; align-items:center; gap:6px; }
+  .tooltip .t-dot{ width:8px; height:8px; border-radius:2px; display:inline-block; }
+
+  .banner{
+    background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:16px 20px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .banner .big{ font-size:22px; font-weight:700; }
+  .banner .big.good{ color:var(--good); }
+  .banner .big.bad{ color:var(--critical); }
+  .footnote{ font-size:11px; color:var(--muted); margin-top:10px; }
+  .assumption-note{ font-size:11px; color:var(--muted); background:var(--surface-2); border-radius:6px; padding:8px 10px; }
+  .injection-list{ display:flex; flex-direction:column; gap:6px; font-size:12px; }
+  .injection-row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .injection-row .amt{ font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; text-align:right; }
+  .injection-row .amt .usd{ font-weight:400; color:var(--muted); font-size:11px; display:inline; }
+  .injection-row.total{ border-top:1px solid var(--grid); margin-top:2px; padding-top:6px; font-weight:700; }
+  .value-display{ font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--series-1); }
+  .value-display .usd{ font-size:12px; font-weight:400; color:var(--muted); margin-left:4px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>Blueground (M) Sdn. Bhd &mdash; Breakeven Calculator<br><span class="i18n-ru">Blueground (M) Sdn. Bhd &mdash; Калькулятор точки безубыточности</span></h1>
+    <div class="sub">BG (Blueground (M) Sdn Bhd) &mdash; mid-term rental unit economics &amp; cash runway model<br><span class="i18n-ru">BG (Blueground (M) Sdn Bhd) &mdash; экономика среднесрочной аренды и модель денежного потока</span></div>
+  </div>
+  <div class="topbar-actions">
+    <button id="btnResetAll">Reset All Inputs to Defaults<br><span class="i18n-ru">Сбросить все параметры по умолчанию</span></button>
+    <a class="site-home" href="index.html">Back to Main Page</a>
+  </div>
+</header>
+
+<main>
+
+  <section id="breakevenBanner">
+    <div class="banner">
+      <div>
+        <div class="kpi-card .label" style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Operational Breakeven<br><span class="i18n-ru" style="text-transform:none;">Операционная точка безубыточности</span></div>
+        <div id="breakevenValue" class="big">&mdash;</div>
+      </div>
+      <div style="flex:1;min-width:260px;font-size:12px;color:var(--text-secondary);" id="breakevenDetail">Adjust the assumptions below &mdash; the forecast recalculates instantly.<br><span class="i18n-ru">Измените параметры ниже &mdash; прогноз пересчитывается мгновенно.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Summary<br><span class="i18n-ru">Сводка</span></h2>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="label">USD&ndash;MYR Exchange Rate<span class="i18n-ru">Курс обмена USD&ndash;MYR</span></div>
+        <input type="number" id="exchangeRate" step="0.0001" value="3.9000">
+        <div class="usd" id="rateSourceNote">Fetching live global rate&hellip;<span class="i18n-ru" style="display:block;">Загрузка актуального глобального курса&hellip;</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Forecast Length (Years)<span class="i18n-ru">Горизонт прогноза (лет)</span></div>
+        <input type="number" id="forecastYears" value="7" step="1" min="1" max="10">
+        <div class="usd">Adjust to see a longer or shorter projection.<span class="i18n-ru" style="display:block;">Измените, чтобы увидеть более длинный или короткий прогноз.</span></div>
+      </div>
+      <div id="kpiGridDynamic" style="display:contents;"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Assumptions<br><span class="i18n-ru">Параметры</span></h2>
+    <div class="input-groups">
+
+      <details class="card" open>
+        <summary><span class="summary-bi"><span>Portfolio &amp; Growth</span><span class="i18n-ru">Портфель и рост</span></span></summary>
+        <div class="card-body">
+          <div class="field">
+            <div class="field-label"><span>New units onboarded per month</span><span class="val" id="unitsPerMonthVal">6</span></div>
+            <div class="field-label-ru">Новых юнитов в месяц</div>
+            <input type="range" id="unitsPerMonth" min="0" max="50" step="1" value="6">
+            <div class="hint">Target to add 5&ndash;10 units/month. Slider range 0&ndash;50.</div>
+            <div class="hint-ru">Цель: добавлять 5&ndash;10 юнитов в месяц. Диапазон ползунка 0&ndash;50.</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span>Furnished vs unfurnished split of new units</span><span class="val" id="furnishedPctVal">50% F / 50% U</span></div>
+            <div class="field-label-ru">Доля меблированных / немеблированных среди новых юнитов</div>
+            <input type="range" id="furnishedPct" min="0" max="100" step="1" value="50">
+          </div>
+          <div class="field">
+            <div class="field-label"><span>Portfolio utilisation</span><span class="val" id="utilisationPctVal">85%</span></div>
+            <div class="field-label-ru">Загрузка портфеля</div>
+            <input type="range" id="utilisationPct" min="0" max="100" step="1" value="85">
+          </div>
+          <div class="field">
+            <div class="field-label">Dead period on new units (weeks)</div>
+            <div class="field-label-ru">Период простоя новых юнитов (недель)</div>
+            <input type="number" id="deadPeriodWeeks" value="0" step="0.5" min="0">
+            <div class="hint">Lease is paid, but unit earns no revenue for this period.</div>
+            <div class="hint-ru">Аренда оплачивается, но юнит не приносит дохода в этот период.</div>
+          </div>
+        </div>
+      </details>
+
+      <details class="card" open>
+        <summary><span class="summary-bi"><span>Revenue Share Apartments</span><span class="i18n-ru">Апартаменты с разделением дохода</span></span></summary>
+        <div class="card-body">
+          <div class="field">
+            <div class="field-label"><span>Mix of new units</span><span class="val" id="revShareMixPctVal">80% Fixed Lease / 20% Revenue Share</span></div>
+            <div class="field-label-ru">Структура новых юнитов</div>
+            <input type="range" id="revShareMixPct" min="0" max="100" step="1" value="20">
+            <div class="hint">Default: an even 50/50 split between fixed lease and revenue share units onboarded.</div>
+            <div class="hint-ru">По умолчанию: равное соотношение 50/50 между юнитами с фиксированной арендой и разделением дохода.</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span>Split of guest rental revenue</span><span class="val" id="revShareBGPctVal">30% Blueground / 70% Landlord</span></div>
+            <div class="field-label-ru">Раздел арендного дохода гостя</div>
+            <input type="range" id="revShareBGPct" min="0" max="100" step="1" value="30">
+          </div>
+          <div class="assumption-note">Revenue Share units carry no fixed lease cost. Instead, the landlord takes a cut of the guest's rental payment (split above, scaled by utilisation &mdash; no revenue, no payout). Blueground keeps the rest of the rental payment, plus 100% of the utilities markup, same as Fixed Lease units. Revenue Share units also carry no deposit (deposits are only paid on Fixed Lease units). Guest pricing, furnished/unfurnished mix, and other acquisition costs (advance rent, setup, furnishing) are otherwise identical to Fixed Lease units.
+            <br><br><span class="i18n-ru">Юниты с разделением дохода не предполагают фиксированную арендную плату. Вместо этого арендодатель получает часть арендного платежа гостя (пропорция указана выше, масштабируется по загрузке &mdash; нет дохода, нет выплаты). Blueground оставляет себе остальную часть арендного платежа, а также 100% наценки на коммунальные услуги &mdash; так же, как и в юнитах с фиксированной арендой. По юнитам с разделением дохода также не взимается депозит (депозит платится только по юнитам с фиксированной арендой). Цены для гостей, доля меблированных/немеблированных юнитов и прочие затраты на привлечение (авансовая аренда, настройка, меблировка) идентичны юнитам с фиксированной арендой.</span></div>
+        </div>
+      </details>
+
+      <details class="card" open>
+        <summary><span class="summary-bi"><span>Target Net Margin</span><span class="i18n-ru">Целевая чистая маржа</span></span></summary>
+        <div class="card-body">
+          <div class="field">
+            <div class="field-label"><span>Target net margin at steady state</span><span class="val" id="targetMarginPctVal">15%</span></div>
+            <div class="field-label-ru">Целевая чистая маржа в стабильном состоянии</div>
+            <input type="range" id="targetMarginPct" min="-20" max="40" step="0.5" value="15">
+            <div class="hint">Revenue each forecast month is derived from that month's total operating cost at the target margin implied by this ramp &mdash; i.e. pricing and corporate/retail mix are assumed to improve steadily to hit this path. This replaces separate lease/utility markup assumptions with a single margin target, matching the Business Roadmap's model.</div>
+            <div class="hint-ru">Выручка каждого прогнозного месяца рассчитывается от операционных затрат этого месяца при целевой марже, заданной этой траекторией &mdash; т.е. предполагается, что ценообразование и структура клиентов будут стабильно улучшаться для достижения этой траектории. Это заменяет отдельные наценки на аренду/коммуналку единой целью по марже, как в модели Бизнес-дорожной карты.</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Months to reach target margin</div>
+            <div class="field-label-ru">Месяцев до достижения целевой маржи</div>
+            <input type="number" id="marginRampMonths" value="36" step="1" min="1">
+            <div class="hint">Net margin ramps linearly from the current actual (Month 10) to the target above, over this many months from Month 11.</div>
+            <div class="hint-ru">Чистая маржа линейно растёт от текущего фактического значения (Месяц 10) до целевого, указанного выше, за это количество месяцев начиная с Месяца 11.</div>
+          </div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary><span class="summary-bi"><span>Costs Per Month (per unit)</span><span class="i18n-ru">Расходы в месяц (на юнит)</span></span></summary>
+        <div class="card-body">
+          <div class="field"><div class="field-label">Fixed Lease &mdash; Furnished Apartment</div>
+            <div class="field-label-ru">Фиксированная аренда &mdash; меблированная квартира</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="leaseFurnished" value="3500"></div>
+            <div class="hint">&asymp; <span id="leaseFurnishedUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Fixed Lease &mdash; Unfurnished Apartment</div>
+            <div class="field-label-ru">Фиксированная аренда &mdash; немеблированная квартира</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="leaseUnfurnished" value="3000"></div>
+            <div class="hint">&asymp; <span id="leaseUnfurnishedUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Utilities &mdash; Electricity</div>
+            <div class="field-label-ru">Коммунальные услуги &mdash; электричество</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="utilElectricity" value="381"></div>
+            <div class="hint">&asymp; <span id="utilElectricityUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Utilities &mdash; Water</div>
+            <div class="field-label-ru">Коммунальные услуги &mdash; вода</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="utilWater" value="40"></div>
+            <div class="hint">&asymp; <span id="utilWaterUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Utilities &mdash; Internet</div>
+            <div class="field-label-ru">Коммунальные услуги &mdash; интернет</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="utilInternet" value="100"></div>
+            <div class="hint">&asymp; <span id="utilInternetUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Utilities &mdash; Sewerage</div>
+            <div class="field-label-ru">Коммунальные услуги &mdash; канализация</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="utilSewerage" value="26"></div>
+            <div class="hint">&asymp; <span id="utilSewerageUsdHint">$0</span></div></div>
+          <div class="hint">All utility line items are consolidated into one "Utilities" cost &amp; markup for the guest price.</div>
+          <div class="hint-ru">Все статьи коммунальных услуг объединяются в одну статью «Коммунальные услуги» для расчёта стоимости и наценки для гостя.</div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary><span class="summary-bi"><span>Unit Acquisition Cost (one-time, per new unit)</span><span class="i18n-ru">Затраты на привлечение юнита (единоразово)</span></span></summary>
+        <div class="card-body">
+          <div class="field"><div class="field-label">Deposit (months of rent)</div>
+            <div class="field-label-ru">Депозит (в месяцах аренды)</div>
+            <input type="number" id="depositMonths" value="1.5" step="0.1"></div>
+          <div class="field"><div class="field-label">Advance rent (months of rent)</div>
+            <div class="field-label-ru">Аванс по аренде (в месяцах аренды)</div>
+            <input type="number" id="advanceRentMonths" value="1" step="0.1"></div>
+          <div class="field"><div class="field-label">BG specific setup</div>
+            <div class="field-label-ru">Настройка (расходы BG)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="setupCost" value="10000"></div>
+            <div class="hint">&asymp; <span id="setupCostUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">BG furnishing cost (unfurnished apartments only)</div>
+            <div class="field-label-ru">Расходы BG на меблировку (только для немеблированных квартир)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="furnishingCostUnfurnished" value="10000"></div>
+            <div class="hint">&asymp; <span id="furnishingCostUnfurnishedUsdHint">$0</span></div></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary><span class="summary-bi"><span>Overhead Costs Per Month</span><span class="i18n-ru">Накладные расходы в месяц</span></span></summary>
+        <div class="card-body">
+          <div class="field"><div class="field-label">Office rental</div>
+            <div class="field-label-ru">Аренда офиса</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="officeRental" value="3000"></div>
+            <div class="hint">&asymp; <span id="officeRentalUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Office utilities</div>
+            <div class="field-label-ru">Коммунальные услуги офиса</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="officeUtilities" value="500"></div>
+            <div class="hint">&asymp; <span id="officeUtilitiesUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Office supplies and others</div>
+            <div class="field-label-ru">Офисные принадлежности и прочее</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="officeSupplies" value="0"></div>
+            <div class="hint">&asymp; <span id="officeSuppliesUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Software fees</div>
+            <div class="field-label-ru">Расходы на ПО</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="softwareFees" value="0"></div>
+            <div class="hint">&asymp; <span id="softwareFeesUsdHint">$0</span></div></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary><span class="summary-bi"><span>Marketing &amp; Advertising Costs</span><span class="i18n-ru">Расходы на маркетинг и рекламу</span></span></summary>
+        <div class="card-body">
+          <div class="field"><div class="field-label">Channel marketing (iProperty, PropertyGuru, etc.) /mo</div>
+            <div class="field-label-ru">Каналы продвижения (iProperty, PropertyGuru и др.) /мес</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="channelMarketing" value="500"></div>
+            <div class="hint">&asymp; <span id="channelMarketingUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">Social media advertising &amp; public relations /mo</div>
+            <div class="field-label-ru">Реклама в соцсетях и PR /мес</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="socialPR" value="0"></div>
+            <div class="hint">&asymp; <span id="socialPRUsdHint">$0</span> &mdash; starts once portfolio reaches this many apartments: <input type="number" id="socialPRThreshold" value="20" style="width:70px;display:inline-block;"></div>
+            <div class="hint-ru">Начинается, когда портфель достигает указанного количества апартаментов.</div></div>
+          <div class="field"><div class="field-label"><span>Royalty to Blueground Holdings Ltd</span><span class="val" id="royaltyPctVal">6%</span></div>
+            <div class="field-label-ru">Роялти для Blueground Holdings Ltd</div>
+            <input type="range" id="royaltyPct" min="0" max="20" step="0.5" value="0"></div>
+          <div class="field"><div class="field-label"><span>SST (Sales &amp; Service Tax)</span><span class="val" id="sstPctVal">8%</span></div>
+            <div class="field-label-ru">SST (налог с продаж и услуг)</div>
+            <input type="range" id="sstPct" min="0" max="20" step="0.5" value="0"></div>
+          <div class="field"><div class="field-label">SST registration threshold (cumulative revenue since inception)</div>
+            <div class="field-label-ru">Порог регистрации SST (накопленный доход с начала деятельности)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="sstThresholdRM" value="500000"></div>
+            <div class="hint">Revenue accumulates from Month 1 with no annual reset. SST applies to all revenue from the month AFTER this running total crosses the threshold (and continues every month after, since revenue only grows).</div>
+            <div class="hint-ru">Доход накапливается с 1-го месяца без ежегодного сброса. SST применяется ко всему доходу начиная с месяца, СЛЕДУЮЩЕГО за тем, в котором накопленная сумма превышает порог (и продолжает применяться каждый месяц далее, поскольку доход только растёт).</div></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary><span class="summary-bi"><span>Workforce</span><span class="i18n-ru">Персонал</span></span></summary>
+        <div class="card-body">
+          <div class="field"><div class="field-label">General Manager</div>
+            <div class="field-label-ru">Генеральный директор</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salGM" value="15000"></div>
+            <div class="hint">&asymp; <span id="salGMUsdHint">$0</span> &mdash; Starts from Month 1.</div>
+            <div class="hint-ru">Начинается с 1-го месяца.</div></div>
+          <div class="field"><div class="field-label">Operations Manager</div>
+            <div class="field-label-ru">Операционный менеджер</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salOps" value="7000"></div>
+            <div class="hint">&asymp; <span id="salOpsUsdHint">$0</span> &mdash; Added once portfolio reaches <input type="number" id="opsThreshold" value="1" style="width:60px;display:inline-block;"> apartments.</div>
+            <div class="hint-ru">Добавляется при достижении портфелем указанного порога апартаментов (см. поле выше).</div></div>
+          <div class="field"><div class="field-label">Customer Experience Executive</div>
+            <div class="field-label-ru">Менеджер по работе с клиентами</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salCX" value="4000"></div>
+            <div class="hint">&asymp; <span id="salCXUsdHint">$0</span> &mdash; Added once portfolio reaches <input type="number" id="cxThreshold" value="1" style="width:60px;display:inline-block;"> apartments.</div>
+            <div class="hint-ru">Добавляется при достижении портфелем указанного порога апартаментов (см. поле выше).</div></div>
+          <div class="field"><div class="field-label">Additional Customer Experience Executive</div>
+            <div class="field-label-ru">Дополнительный менеджер по работе с клиентами</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salCXExtra" value="3000"></div>
+            <div class="hint">&asymp; <span id="salCXExtraUsdHint">$0</span> &mdash; Added once portfolio reaches <input type="number" id="cxExtraThreshold" value="30" style="width:60px;display:inline-block;"> apartments.</div>
+            <div class="hint-ru">Добавляется при достижении портфелем указанного порога апартаментов (см. поле выше).</div></div>
+          <div class="field"><div class="field-label">Inbound Sales Associate + Corporate Sales Manager (combined)</div>
+            <div class="field-label-ru">Специалист по входящим продажам + менеджер по корп. продажам (вместе)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salSales" value="13000"></div>
+            <div class="hint">&asymp; <span id="salSalesUsdHint">$0</span> &mdash; Added once portfolio reaches <input type="number" id="salesThreshold" value="1" style="width:60px;display:inline-block;"> apartments.</div>
+            <div class="hint-ru">Добавляется при достижении портфелем указанного порога апартаментов (см. поле выше).</div></div>
+          <div class="field"><div class="field-label">Assistant Inbound Sales Associate + Maintenance Person (combined)</div>
+            <div class="field-label-ru">Ассистент специалиста по продажам + специалист по обслуживанию (вместе)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salSalesExtra" value="6000"></div>
+            <div class="hint">&asymp; <span id="salSalesExtraUsdHint">$0</span> &mdash; Added once portfolio reaches <input type="number" id="salesExtraThreshold" value="30" style="width:60px;display:inline-block;"> apartments.</div>
+            <div class="hint-ru">Добавляется при достижении портфелем указанного порога апартаментов (см. поле выше).</div></div>
+          <div class="field"><div class="field-label">Real Estate Manager</div>
+            <div class="field-label-ru">Менеджер по недвижимости</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salRE" value="4000"></div>
+            <div class="hint">&asymp; <span id="salREUsdHint">$0</span> &mdash; Added once portfolio reaches <input type="number" id="realEstateThreshold" value="1" style="width:60px;display:inline-block;"> apartments.</div>
+            <div class="hint-ru">Добавляется при достижении портфелем указанного порога апартаментов (см. поле выше).</div></div>
+          <div class="field"><div class="field-label">Accountant</div>
+            <div class="field-label-ru">Бухгалтер</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="salAccountant" value="6500"></div>
+            <div class="hint">&asymp; <span id="salAccountantUsdHint">$0</span> &mdash; Added once portfolio reaches <input type="number" id="accountantThreshold" value="30" style="width:60px;display:inline-block;"> apartments.</div>
+            <div class="hint-ru">Добавляется при достижении портфелем указанного порога апартаментов (см. поле выше).</div></div>
+          <div class="field"><div class="field-label">Cleaning Crew &mdash; rate per person</div>
+            <div class="field-label-ru">Клининговая бригада &mdash; ставка на человека</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="cleanerRate" value="2500"></div>
+            <div class="hint">&asymp; <span id="cleanerRateUsdHint">$0</span> &mdash; <input type="number" id="cleanerBaseCount" value="2" style="width:50px;display:inline-block;"> persons today, +1 for every <input type="number" id="cleanerRatioUnits" value="20" style="width:50px;display:inline-block;"> apartments added beyond the current <input type="number" id="cleanerBaseUnits" value="15" style="width:50px;display:inline-block;">.</div>
+            <div class="hint-ru">Сегодня в бригаде указанное число человек; +1 человек на каждые N дополнительных апартаментов сверх текущей базы (см. поля выше).</div></div>
+          <div class="field"><div class="field-label"><span>Statutory contributions (EPF + SOCSO + EIS, employer)</span><span class="val" id="statutoryPctVal">15%</span></div>
+            <div class="field-label-ru">Обязательные отчисления (EPF + SOCSO + EIS, за счёт работодателя)</div>
+            <input type="range" id="statutoryPct" min="0" max="30" step="0.5" value="15">
+            <div class="hint">Applied on top of every salary in this section.</div>
+            <div class="hint-ru">Применяется ко всем зарплатам в этом разделе.</div></div>
+        </div>
+      </details>
+
+      <details class="card">
+        <summary><span class="summary-bi"><span>Cash &amp; Investment</span><span class="i18n-ru">Денежные средства и инвестиции</span></span></summary>
+        <div class="card-body">
+          <div class="field">
+            <div class="field-label">Cash Injections to Date (actual, Months 1&ndash;10)</div>
+            <div class="field-label-ru">Внесённые денежные средства на сегодня (факт, месяцы 1&ndash;10)</div>
+            <div class="injection-list" id="historicalInjectionsList"></div>
+            <div class="hint">Of the Month 1 equity, US$50,000 (&asymp;RM&nbsp;204,620 at the current rate) was paid to Blueground Holdings Ltd as a royalty deposit &mdash; royalty is drawn from this deposit (no cash impact to Blueground Malaysia) until it depletes, shown below.</div>
+            <div class="hint-ru">Из капитала, внесённого в Месяце 1, US$50,000 (&asymp;RM&nbsp;204,620 по текущему курсу) были уплачены Blueground Holdings Ltd в качестве депозита роялти &mdash; роялти списывается с этого депозита (без влияния на денежные средства Blueground Malaysia) до его исчерпания (см. ниже).</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Royalty Deposit Remaining (Month 10, current)</div>
+            <div class="field-label-ru">Остаток депозита роялти (Месяц 10, на сегодня)</div>
+            <div class="value-display" id="royaltyDepositRemainingHint">&mdash;</div>
+          </div>
+          <div class="field"><div class="field-label">Cash injection multiple (future shortfalls, Month 11 onward)</div>
+            <div class="field-label-ru">Кратность денежных вливаний (будущие потребности, с 11-го месяца)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="injectionMultipleRM" value="1800000" step="10000"></div>
+            <div class="hint">&asymp; <span id="injectionMultipleUsdHint">$100,000</span> &mdash; from Month 11 onward, whenever the account would go cash-negative, a further injection of this size (or a multiple of it) is drawn.</div>
+            <div class="hint-ru">&mdash; начиная с 11-го месяца, как только баланс становится отрицательным, привлекается дополнительное вливание такого размера (или кратное ему).</div></div>
+          <div class="field">
+            <div class="field-label">Total Additional Injections Required to Reach Breakeven</div>
+            <div class="field-label-ru">Итого дополнительных вливаний для выхода на безубыточность</div>
+            <div class="value-display" id="remainingInjectionsHint">&mdash;</div>
+          </div>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Forecast Charts<br><span class="i18n-ru">Графики прогноза</span></h2>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Revenue, Total Cost &amp; Net Profit<br><span class="i18n-ru">Выручка, общие затраты и чистая прибыль</span></h3>
+        <div class="chart-sub">Monthly, over the forecast horizon<br><span class="i18n-ru">Ежемесячно, на горизонте прогноза</span></div>
+        <div class="legend">
+          <span class="item"><span class="dot" style="background:var(--series-1)"></span>Revenue / Выручка</span>
+          <span class="item"><span class="dot" style="background:var(--series-8)"></span>Total Cost / Общие затраты</span>
+          <span class="item"><span class="dot" style="background:var(--series-4)"></span>Net Profit / Чистая прибыль</span>
+        </div>
+        <div class="chart-svg-wrap" id="chart1wrap"></div>
+      </div>
+      <div class="chart-card">
+        <h3>Cash Balance<br><span class="i18n-ru">Денежный баланс</span></h3>
+        <div class="chart-sub">Includes initial investment and any additional cash injections (marked)<br><span class="i18n-ru">Включает первоначальные инвестиции и любые дополнительные вливания (отмечены)</span></div>
+        <div class="legend">
+          <span class="item"><span class="dot" style="background:var(--series-1)"></span>Cash Balance / Денежный баланс</span>
+          <span class="item"><span class="dot" style="background:var(--series-3)"></span>Cash Injection / Денежное вливание</span>
+        </div>
+        <div class="chart-svg-wrap" id="chart2wrap"></div>
+      </div>
+      <div class="chart-card">
+        <h3>Portfolio Growth<br><span class="i18n-ru">Рост портфеля</span></h3>
+        <div class="chart-sub">Cumulative furnished vs unfurnished apartments<br><span class="i18n-ru">Накопительно: меблированные и немеблированные квартиры</span></div>
+        <div class="legend">
+          <span class="item"><span class="dot" style="background:var(--series-1)"></span>Furnished / Меблированные</span>
+          <span class="item"><span class="dot" style="background:var(--series-2)"></span>Unfurnished / Немеблированные</span>
+        </div>
+        <div class="chart-svg-wrap" id="chart3wrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Monthly Forecast<br><span class="i18n-ru">Ежемесячный прогноз</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Month<br><span class="i18n-ru">Месяц</span></th>
+            <th>New Units<br><span class="i18n-ru">Новые юниты</span></th>
+            <th>Portfolio (F / U)<br><span class="i18n-ru">Портфель (М / Н)</span></th>
+            <th>Rev Share Units<br><span class="i18n-ru">Юниты с разд. дохода</span></th>
+            <th>Revenue<br><span class="i18n-ru">Выручка</span></th>
+            <th>Royalty<br><span class="i18n-ru">Роялти</span></th>
+            <th>SST<br><span class="i18n-ru">SST</span></th>
+            <th>Total Cost<br><span class="i18n-ru">Общие затраты</span></th>
+            <th>Net Profit<br><span class="i18n-ru">Чистая прибыль</span></th>
+            <th>Margin<br><span class="i18n-ru">Маржа</span></th>
+            <th>Cash Balance<br><span class="i18n-ru">Ден. баланс</span></th>
+            <th>Cash Injected<br><span class="i18n-ru">Внесено средств</span></th>
+            <th>Runway (mo)<br><span class="i18n-ru">Запас хода (мес)</span></th>
+          </tr>
+        </thead>
+        <tbody id="forecastBody"></tbody>
+      </table>
+    </div>
+    <div class="footnote">Gross burn = total monthly cost before revenue. Net burn = total cost minus revenue (shown as negative once profitable). Runway = cash balance &divide; net burn, when net burn is positive.
+      <br><br><span class="i18n-ru">Валовое сжигание = общие месячные затраты до учёта дохода. Чистое сжигание = общие затраты минус доход (отображается отрицательным после выхода в прибыль). Запас хода = денежный баланс &divide; чистое сжигание, когда чистое сжигание положительно.</span></div>
+  </section>
+
+</main>
+
+<script>
+const GLOBAL_DEFAULT_RATE = 3.9000;
+
+const fieldIds = [
+  'unitsPerMonth','furnishedPct','utilisationPct','deadPeriodWeeks','forecastYears',
+  'revShareMixPct','revShareBGPct',
+  'targetMarginPct','marginRampMonths',
+  'leaseFurnished','leaseUnfurnished','utilElectricity','utilWater','utilInternet','utilSewerage',
+  'depositMonths','advanceRentMonths','setupCost','furnishingCostUnfurnished',
+  'officeRental','officeUtilities','officeSupplies','softwareFees',
+  'channelMarketing','socialPR','socialPRThreshold',
+  'royaltyPct','sstPct','sstThresholdRM',
+  'salGM','salOps','opsThreshold',
+  'salCX','cxThreshold','salCXExtra','cxExtraThreshold',
+  'salSales','salesThreshold','salSalesExtra','salesExtraThreshold',
+  'salRE','realEstateThreshold','salAccountant','accountantThreshold',
+  'cleanerRate','cleanerBaseCount','cleanerRatioUnits','cleanerBaseUnits',
+  'statutoryPct',
+  'injectionMultipleRM'
+];
+const defaults = {};
+fieldIds.forEach(id => { defaults[id] = document.getElementById(id).value; });
+defaults['exchangeRate'] = String(GLOBAL_DEFAULT_RATE);
+
+function v(id){ return parseFloat(document.getElementById(id).value) || 0; }
+
+function getEffectiveRate(){
+  return v('exchangeRate') || GLOBAL_DEFAULT_RATE;
+}
+
+function fmtMYR(n){
+  const r = Math.round(n);
+  return 'RM ' + r.toLocaleString('en-MY');
+}
+function fmtUSD(n){
+  const r = Math.round(n);
+  return '$' + r.toLocaleString('en-US');
+}
+function myrUsdSpan(n, rate){
+  return `<span class="myr">${fmtMYR(n)}</span><span class="usd">&asymp; ${fmtUSD(n/rate)}</span>`;
+}
+
+const HISTORICAL_UNTIL = 10;
+const ROYALTY_DEPOSIT_USD = 50000;
+// Actual month-by-month unit onboarding/drops, Month 1-10 (fixed lease vs revenue share)
+const historicalUnitEvents = {
+  1:  {newFixed:8, newRevShare:0, dropFixed:0, dropRevShare:0},
+  2:  {newFixed:2, newRevShare:0, dropFixed:0, dropRevShare:0},
+  3:  {newFixed:0, newRevShare:0, dropFixed:0, dropRevShare:0},
+  4:  {newFixed:3, newRevShare:0, dropFixed:0, dropRevShare:0},
+  5:  {newFixed:1, newRevShare:0, dropFixed:0, dropRevShare:0},
+  6:  {newFixed:2, newRevShare:0, dropFixed:0, dropRevShare:0},
+  7:  {newFixed:3, newRevShare:2, dropFixed:0, dropRevShare:0},
+  8:  {newFixed:2, newRevShare:0, dropFixed:0, dropRevShare:0},
+  9:  {newFixed:0, newRevShare:0, dropFixed:2, dropRevShare:0},
+  10: {newFixed:0, newRevShare:0, dropFixed:4, dropRevShare:2},
+};
+// Actual cash injections raised to date (gross, before the royalty-deposit carve-out)
+const historicalInjections = [
+  {m:1, rmGross:807000, label:'Month 1 &mdash; Soulasia Capital equity', labelRu:'Месяц 1 &mdash; Акционерный капитал Soulasia Capital'},
+  {m:3, rmGross:100000,  label:'Month 3 &mdash; Mr. Iqb loan (8% p.a.)', labelRu:'Месяц 3 &mdash; Заём г-на Iqb (8% годовых)'},
+  {m:5, usdGross:75000,  label:'Month 5 &mdash; Wthr loan 1 (US$75,000, 12% p.a.)', labelRu:'Месяц 5 &mdash; Заём Wthr 1 (US$75,000, 12% годовых)'},
+  {m:6, usdGross:100000, label:'Month 6 &mdash; Wthr loan 2 (US$100,000, 12% p.a.)', labelRu:'Месяц 6 &mdash; Заём Wthr 2 (US$100,000, 12% годовых)'},
+];
+// Month 10 = confirmed actual position (overrides the formula for that month only)
+const MONTH10_ACTUALS = { revenue:70574, totalCost:123600, cash:70000 };
+
+function compute(){
+  const rate = getEffectiveRate();
+  const unitsPerMonth = v('unitsPerMonth');
+  const furnishedPct = v('furnishedPct');
+  const utilisationPct = v('utilisationPct');
+  const deadPeriodWeeks = v('deadPeriodWeeks');
+  const forecastMonths = Math.max(HISTORICAL_UNTIL, Math.round(v('forecastYears')*12));
+
+  const revShareMixPct = v('revShareMixPct');
+  const revShareBGPct = v('revShareBGPct');
+
+  const targetMarginPct = v('targetMarginPct');
+  const marginRampMonths = v('marginRampMonths') || 36;
+
+  const leaseFurnished = v('leaseFurnished');
+  const leaseUnfurnished = v('leaseUnfurnished');
+  const utilPerUnit = v('utilElectricity')+v('utilWater')+v('utilInternet')+v('utilSewerage');
+
+  const depositMonths = v('depositMonths');
+  const advanceRentMonths = v('advanceRentMonths');
+  const setupCost = v('setupCost');
+  const furnishingCostUnfurnished = v('furnishingCostUnfurnished');
+
+  const overheadCost = v('officeRental')+v('officeUtilities')+v('officeSupplies')+v('softwareFees');
+
+  const channelMarketing = v('channelMarketing');
+  const socialPR = v('socialPR');
+  const socialPRThreshold = v('socialPRThreshold');
+
+  const royaltyPct = v('royaltyPct');
+  const sstPct = v('sstPct');
+  const sstThresholdRM = v('sstThresholdRM');
+
+  const salGM = v('salGM');
+  const salOps = v('salOps'), opsThreshold = v('opsThreshold');
+  const salCX = v('salCX'), cxThreshold = v('cxThreshold');
+  const salCXExtra = v('salCXExtra'), cxExtraThreshold = v('cxExtraThreshold');
+  const salSales = v('salSales'), salesThreshold = v('salesThreshold');
+  const salSalesExtra = v('salSalesExtra'), salesExtraThreshold = v('salesExtraThreshold');
+  const salRE = v('salRE'), realEstateThreshold = v('realEstateThreshold');
+  const salAccountant = v('salAccountant'), accountantThreshold = v('accountantThreshold');
+  const cleanerRate = v('cleanerRate'), cleanerBaseCount = v('cleanerBaseCount');
+  const cleanerRatioUnits = v('cleanerRatioUnits') || 1;
+  const cleanerBaseUnits = v('cleanerBaseUnits');
+  const statutoryPct = v('statutoryPct');
+
+  const injectionMultipleRM = v('injectionMultipleRM') || 400000;
+
+  const depositPerFurnished = depositMonths*leaseFurnished;
+  const depositPerUnfurnished = depositMonths*leaseUnfurnished;
+  const perFurnishedAcqFixed = depositPerFurnished + advanceRentMonths*leaseFurnished + setupCost;
+  const perUnfurnishedAcqFixed = depositPerUnfurnished + advanceRentMonths*leaseUnfurnished + setupCost + furnishingCostUnfurnished;
+  const perFurnishedAcqRevShare = advanceRentMonths*leaseFurnished + setupCost;
+  const perUnfurnishedAcqRevShare = advanceRentMonths*leaseUnfurnished + setupCost + furnishingCostUnfurnished;
+
+  const deadDays = deadPeriodWeeks*7;
+  const newUnitFraction = Math.max(0, (30-deadDays))/30;
+
+  // Net margin at Month 10 (actual) is the anchor the forward ramp starts from.
+  const startMarginPct = MONTH10_ACTUALS.revenue>0 ? ((MONTH10_ACTUALS.revenue-MONTH10_ACTUALS.totalCost)/MONTH10_ACTUALS.revenue*100) : 0;
+  // Confirmed actual revenue, Months 2-9 (Month 1 had no revenue; Month 10 uses MONTH10_ACTUALS below).
+  const HISTORICAL_REVENUE = {2:10007, 3:32982, 4:33489, 5:38953, 6:39659, 7:55747, 8:56698, 9:65442};
+  // One-time takeover buyout (Soulasia + Mr. Iqb, incl. accrued interest), paid at Month 11.
+  const BUYOUT_MONTH = HISTORICAL_UNTIL+1;
+  const BUYOUT_RM = 913000;
+
+  // Royalty deposit: US$50,000 paid to Blueground Holdings up front; royalty owed each
+  // month is drawn from this deposit (no cash impact to BG Malaysia) until it depletes.
+  const royaltyDepositInitialRM = ROYALTY_DEPOSIT_USD * rate;
+  let royaltyDepositBalance = royaltyDepositInitialRM;
+
+  // Historical cash injections: month 1's equity is net of the deposit carve-out
+  // (that portion left BG Malaysia's account immediately). Track gross separately
+  // for "total capital raised" reporting.
+  const historicalInjectionsByMonth = {};
+  const historicalInjectionsGrossByMonth = {};
+  historicalInjections.forEach(inj=>{
+    const rmGross = inj.rmGross!==undefined ? inj.rmGross : inj.usdGross*rate;
+    const rmNet = (inj.m===1) ? (rmGross - royaltyDepositInitialRM) : rmGross;
+    historicalInjectionsByMonth[inj.m] = (historicalInjectionsByMonth[inj.m]||0) + rmNet;
+    historicalInjectionsGrossByMonth[inj.m] = (historicalInjectionsGrossByMonth[inj.m]||0) + rmGross;
+  });
+
+  let fixedFurnishedCum = 0, fixedUnfurnishedCum = 0, revShareFurnishedCum = 0, revShareUnfurnishedCum = 0;
+  let fwdRevShareCum = 0;
+  let cashBalance = 0;
+  let totalInjected = 0;
+  let totalHistoricalInjectedGross = 0;
+  let cumulativeProfit = 0;
+  let cumulativeRevenue = 0;
+  let cumulativeDeposits = 0;
+  const rows = [];
+
+  for(let m=1; m<=forecastMonths; m++){
+    if(historicalInjectionsByMonth[m]) cashBalance += historicalInjectionsByMonth[m];
+    if(historicalInjectionsGrossByMonth[m]) totalHistoricalInjectedGross += historicalInjectionsGrossByMonth[m];
+
+    const isHistorical = m<=HISTORICAL_UNTIL;
+    const ev = isHistorical ? historicalUnitEvents[m] : null;
+
+    let newRevShareUnits;
+    if(isHistorical){
+      newRevShareUnits = ev.newRevShare;
+    } else {
+      // Cumulative-target rounding (not a flat per-month rounding) so the long-run
+      // Fixed-Lease/Revenue-Share ratio matches the target exactly over many months,
+      // the same approach used in the Business Roadmap & Playbook.
+      const fwdIdx = m-HISTORICAL_UNTIL;
+      const targetCumRS = Math.round(unitsPerMonth*revShareMixPct/100*fwdIdx);
+      newRevShareUnits = Math.max(0, Math.min(unitsPerMonth, targetCumRS-fwdRevShareCum));
+      fwdRevShareCum += newRevShareUnits;
+    }
+    const newFixedUnits = isHistorical ? ev.newFixed : (unitsPerMonth - newRevShareUnits);
+    const dropFixedUnits = isHistorical ? ev.dropFixed : 0;
+    const dropRevShareUnits = isHistorical ? ev.dropRevShare : 0;
+
+    const newFixedFurnished = Math.round(newFixedUnits*furnishedPct/100);
+    const newFixedUnfurnished = newFixedUnits - newFixedFurnished;
+    const newRevShareFurnished = Math.round(newRevShareUnits*furnishedPct/100);
+    const newRevShareUnfurnished = newRevShareUnits - newRevShareFurnished;
+
+    const existingFixedFurnished = fixedFurnishedCum;
+    const existingFixedUnfurnished = fixedUnfurnishedCum;
+    const existingRevShareFurnished = revShareFurnishedCum;
+    const existingRevShareUnfurnished = revShareUnfurnishedCum;
+
+    fixedFurnishedCum += newFixedFurnished;
+    fixedUnfurnishedCum += newFixedUnfurnished;
+    revShareFurnishedCum += newRevShareFurnished;
+    revShareUnfurnishedCum += newRevShareUnfurnished;
+
+    if(dropFixedUnits>0 || dropRevShareUnits>0){
+      const dropFixedFurnished = Math.round(dropFixedUnits*furnishedPct/100);
+      const dropFixedUnfurnished = dropFixedUnits - dropFixedFurnished;
+      const dropRevShareFurnished = Math.round(dropRevShareUnits*furnishedPct/100);
+      const dropRevShareUnfurnished = dropRevShareUnits - dropRevShareFurnished;
+      fixedFurnishedCum -= dropFixedFurnished;
+      fixedUnfurnishedCum -= dropFixedUnfurnished;
+      revShareFurnishedCum -= dropRevShareFurnished;
+      revShareUnfurnishedCum -= dropRevShareUnfurnished;
+    }
+
+    const furnishedCum = fixedFurnishedCum + revShareFurnishedCum;
+    const unfurnishedCum = fixedUnfurnishedCum + revShareUnfurnishedCum;
+    const portfolioTotal = furnishedCum + unfurnishedCum;
+    const revShareTotal = revShareFurnishedCum + revShareUnfurnishedCum;
+
+    const newFurnished = newFixedFurnished + newRevShareFurnished;
+    const newUnfurnished = newFixedUnfurnished + newRevShareUnfurnished;
+    const existingFurnished = existingFixedFurnished + existingRevShareFurnished;
+    const existingUnfurnished = existingFixedUnfurnished + existingRevShareUnfurnished;
+
+    // Revenue Share units carry no rent, no utilities and no acquisition cost to Blueground
+    // (landlord-owned, 70/30 guest-payment split) -- matches the Business Roadmap's model.
+    // The original 15 fixed-lease units are a legacy block at a flat RM 56,200/month; fixed-
+    // lease units added beyond that baseline are charged at the blended furnished/unfurnished rate.
+    const fixedLeaseTotal = fixedFurnishedCum + fixedUnfurnishedCum;
+    const LEGACY_RENT_15 = 56200;
+    const blendedRentNew = (leaseFurnished+leaseUnfurnished)/2;
+    const leaseCost = (m>HISTORICAL_UNTIL)
+      ? (LEGACY_RENT_15 + Math.max(0, fixedLeaseTotal-15)*blendedRentNew)
+      : (fixedFurnishedCum*leaseFurnished + fixedUnfurnishedCum*leaseUnfurnished);
+    const utilitiesCost = fixedLeaseTotal*utilPerUnit;
+    const acquisitionCost = newFixedFurnished*perFurnishedAcqFixed + newFixedUnfurnished*perUnfurnishedAcqFixed;
+    const newDeposits = newFixedFurnished*depositPerFurnished + newFixedUnfurnished*depositPerUnfurnished;
+    cumulativeDeposits += newDeposits;
+
+    // Revenue Share units carry no fixed lease cost and are not separately modeled in
+    // revenue (matches the Business Roadmap's target-margin-driven approach) or payout cost.
+    const revSharePayout = 0;
+
+    const marketingCost = channelMarketing
+      + (portfolioTotal>=socialPRThreshold ? socialPR : 0);
+
+    const opsCount = portfolioTotal>=opsThreshold ? 1 : 0;
+    const cxBaseCount = portfolioTotal>=cxThreshold ? 1 : 0;
+    const extraCXCount = portfolioTotal>=cxExtraThreshold ? 1 : 0;
+    const salesBaseCount = portfolioTotal>=salesThreshold ? 1 : 0;
+    const extraSalesCount = portfolioTotal>=salesExtraThreshold ? 1 : 0;
+    const realEstateCount = portfolioTotal>=realEstateThreshold ? 1 : 0;
+    const accountantCount = portfolioTotal>=accountantThreshold ? 1 : 0;
+
+    const cleanerCount = cleanerBaseCount + Math.max(0, Math.floor((portfolioTotal-cleanerBaseUnits)/cleanerRatioUnits));
+    const cleaningCost = cleanerCount*cleanerRate;
+
+    const totalSalaries = salGM
+      + opsCount*salOps
+      + cxBaseCount*salCX + extraCXCount*salCXExtra
+      + salesBaseCount*salSales + extraSalesCount*salSalesExtra
+      + realEstateCount*salRE + accountantCount*salAccountant
+      + cleaningCost;
+    const payrollCost = totalSalaries*(1+statutoryPct/100);
+
+    // Capex (deposit/advance-rent/setup for new units) is funded from cash separately
+    // and is NOT part of the operating cost the target-margin ramp is measured against
+    // (matches the Business Roadmap, where "New Unit Setup Investment" sits outside opex).
+    const baseCost = leaseCost + utilitiesCost + revSharePayout + overheadCost + marketingCost + payrollCost;
+
+    let revenue;
+    if(HISTORICAL_REVENUE[m]!==undefined) revenue = HISTORICAL_REVENUE[m];
+    else if(m===1) revenue = 0;
+    else if(m===HISTORICAL_UNTIL) revenue = MONTH10_ACTUALS.revenue;
+    else {
+      // Forward months: revenue is derived from this month's operating cost at the
+      // net-margin target implied by the ramp (matches the Business Roadmap's model).
+      const rampProgress = Math.min(m-HISTORICAL_UNTIL, marginRampMonths)/marginRampMonths;
+      const marginTarget = startMarginPct + (targetMarginPct-startMarginPct)*rampProgress;
+      revenue = marginTarget<100 ? baseCost/(1-marginTarget/100) : baseCost;
+    }
+
+    const royalty = revenue*royaltyPct/100;
+    const sstApplicable = cumulativeRevenue >= sstThresholdRM;
+    const sst = sstApplicable ? revenue*sstPct/100 : 0;
+    cumulativeRevenue += revenue;
+
+    let totalCost = baseCost + royalty + sst;
+    if(m===HISTORICAL_UNTIL) totalCost = MONTH10_ACTUALS.totalCost;
+    const netProfit = revenue - totalCost;
+    cumulativeProfit += netProfit;
+
+    const royaltySubsidyThisMonth = Math.min(royalty, royaltyDepositBalance);
+    royaltyDepositBalance -= royaltySubsidyThisMonth;
+
+    let injected = 0;
+    if(m===HISTORICAL_UNTIL){
+      cashBalance = MONTH10_ACTUALS.cash;
+    } else {
+      cashBalance += netProfit + royaltySubsidyThisMonth;
+      if(m>HISTORICAL_UNTIL) cashBalance -= acquisitionCost;
+      if(m===BUYOUT_MONTH){
+        cashBalance -= BUYOUT_RM;
+      }
+      if(m>HISTORICAL_UNTIL && cashBalance < 0){
+        const unitsNeeded = Math.ceil((-cashBalance)/injectionMultipleRM);
+        injected = unitsNeeded*injectionMultipleRM;
+        cashBalance += injected;
+        totalInjected += injected;
+      }
+    }
+
+    const grossBurn = totalCost;
+    const netBurn = totalCost - revenue;
+    const runway = netBurn>0 ? cashBalance/netBurn : Infinity;
+
+    rows.push({
+      m, newUnits: newFixedUnits+newRevShareUnits, newFurnished, newUnfurnished,
+      furnishedCum, unfurnishedCum, portfolioTotal, revShareTotal,
+      revenue, totalCost, netProfit, marginPct: revenue>0 ? (netProfit/revenue*100) : 0,
+      royalty, sst, royaltyDepositBalance,
+      cashBalance, injected, grossBurn, netBurn, runway,
+      cumulativeProfit, cumulativeRevenue, cumulativeDeposits,
+      isHistorical
+    });
+  }
+
+  const breakevenRow = rows.find(r => r.netProfit > 0) || null;
+  const totalCapital = totalHistoricalInjectedGross + totalInjected;
+  const remainingInjectionsToBreakeven = rows
+    .filter(r => r.m>HISTORICAL_UNTIL && (breakevenRow ? r.m<=breakevenRow.m : true))
+    .reduce((sum,r)=>sum+r.injected, 0);
+
+  const currentRow = rows.find(r => r.m===HISTORICAL_UNTIL);
+
+  return { rate, rows, breakevenRow, totalInjected, totalCapital,
+    totalHistoricalInjectedGross, remainingInjectionsToBreakeven,
+    royaltyDepositInitialRM, royaltyDepositBalance: currentRow.royaltyDepositBalance };
+}
+
+function renderKPIs(data){
+  const rate = data.rate;
+  const last = data.rows[data.rows.length-1];
+  const kpis = [];
+
+  kpis.push({label:'Breakeven Month', labelRu:'Месяц безубыточности', value: data.breakevenRow ? `Month ${data.breakevenRow.m} / Месяц ${data.breakevenRow.m}` : 'Not within horizon / Вне горизонта', usd:''});
+  kpis.push({label:'Portfolio Size at Breakeven', labelRu:'Размер портфеля на момент безубыточности', value: data.breakevenRow ? `${data.breakevenRow.portfolioTotal} units / юнитов` : '—', usd:''});
+  kpis.push({label:`Runway (Month ${last.m})`, labelRu:`Запас хода (Месяц ${last.m})`, value: last.runway===Infinity ? 'Profitable / Прибыльно' : `${last.runway.toFixed(1)} months / мес.`, usd:'', cls: last.runway===Infinity?'good':''});
+  kpis.push({label:`Portfolio Size at Forecast Length (Month ${last.m})`, labelRu:`Размер портфеля на конец горизонта прогноза (Месяц ${last.m})`, value: `${last.portfolioTotal} units / юнитов`, usd:''});
+  kpis.push({label:`Cash Balance (Month ${last.m})`, labelRu:`Денежный баланс (Месяц ${last.m})`, value: fmtMYR(last.cashBalance), usd: fmtUSD(last.cashBalance/rate), cls:'good'});
+  kpis.push({label:`Total Deposits Sitting with Landlords (Month ${last.m})`, labelRu:`Депозиты у арендодателей (Месяц ${last.m})`, value: fmtMYR(last.cumulativeDeposits), usd: fmtUSD(last.cumulativeDeposits/rate), cls:''});
+  kpis.push({label:'Total Capital Invested', labelRu:'Всего инвестировано капитала', value: fmtMYR(data.totalCapital), usd: fmtUSD(data.totalCapital/rate), cls:''});
+  kpis.push({label:'Additional Cash Injected', labelRu:'Дополнительно внесено средств', value: fmtMYR(data.totalInjected), usd: fmtUSD(data.totalInjected/rate), cls: data.totalInjected>0?'bad':'good'});
+  kpis.push({label:`Cumulative Net Profit (Month ${last.m})`, labelRu:`Накопленная чистая прибыль (Месяц ${last.m})`, value: fmtMYR(last.cumulativeProfit), usd: fmtUSD(last.cumulativeProfit/rate), cls: last.cumulativeProfit>=0?'good':'bad'});
+
+  const grid = document.getElementById('kpiGridDynamic');
+  grid.innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="label">${k.label}<span class="i18n-ru">${k.labelRu}</span></div>
+      <div class="value ${k.cls||''}">${k.value}</div>
+      ${k.usd ? `<div class="usd">&asymp; ${k.usd}</div>` : ''}
+    </div>
+  `).join('');
+
+  const banner = document.getElementById('breakevenValue');
+  const detail = document.getElementById('breakevenDetail');
+  if(data.breakevenRow){
+    banner.innerHTML = `Month ${data.breakevenRow.m} <span class="i18n-ru" style="display:inline;">/ Месяц ${data.breakevenRow.m}</span>`;
+    banner.className = 'big good';
+    detail.innerHTML = `At month ${data.breakevenRow.m}, monthly revenue (${fmtMYR(data.breakevenRow.revenue)} &asymp; ${fmtUSD(data.breakevenRow.revenue/rate)}) first exceeds total monthly cost (${fmtMYR(data.breakevenRow.totalCost)} &asymp; ${fmtUSD(data.breakevenRow.totalCost/rate)}) with a portfolio of ${data.breakevenRow.portfolioTotal} apartments.<br><span class="i18n-ru">В месяце ${data.breakevenRow.m} ежемесячная выручка (${fmtMYR(data.breakevenRow.revenue)} &asymp; ${fmtUSD(data.breakevenRow.revenue/rate)}) впервые превышает общие ежемесячные затраты (${fmtMYR(data.breakevenRow.totalCost)} &asymp; ${fmtUSD(data.breakevenRow.totalCost/rate)}) при портфеле из ${data.breakevenRow.portfolioTotal} апартаментов.</span>`;
+  } else {
+    banner.innerHTML = `Not reached <span class="i18n-ru" style="display:inline;">/ Не достигнуто</span>`;
+    banner.className = 'big bad';
+    detail.innerHTML = `The business does not reach a profitable month within the ${data.rows.length}-month forecast horizon. Try increasing utilisation, markups, or units/month, or extend the forecast length.<br><span class="i18n-ru">Бизнес не выходит на прибыльный месяц в пределах ${data.rows.length}-месячного горизонта прогноза. Попробуйте увеличить загрузку, наценки, количество юнитов в месяц или горизонт прогноза.</span>`;
+  }
+}
+
+function renderTable(data){
+  const rate = data.rate;
+  const body = document.getElementById('forecastBody');
+  body.innerHTML = data.rows.map(r => `
+    <tr class="${data.breakevenRow && r.m===data.breakevenRow.m ? 'breakeven' : ''}">
+      <td>${r.m}</td>
+      <td>${r.newUnits} <span style="color:var(--muted);font-size:10.5px;">(${r.newFurnished}F/${r.newUnfurnished}U)</span></td>
+      <td>${r.portfolioTotal} <span style="color:var(--muted);font-size:10.5px;">(${r.furnishedCum}F/${r.unfurnishedCum}U)</span></td>
+      <td>${r.revShareTotal}</td>
+      <td>${myrUsdSpan(r.revenue, rate)}</td>
+      <td>${r.royalty>0 ? myrUsdSpan(r.royalty, rate) : '&mdash;'}</td>
+      <td>${r.sst>0 ? myrUsdSpan(r.sst, rate) : '&mdash;'}</td>
+      <td>${myrUsdSpan(r.totalCost, rate)}</td>
+      <td class="${r.netProfit>=0?'pos':'neg'}">${myrUsdSpan(r.netProfit, rate)}</td>
+      <td class="${r.marginPct>=0?'pos':'neg'}">${r.marginPct.toFixed(1)}%</td>
+      <td>${myrUsdSpan(r.cashBalance, rate)}</td>
+      <td>${r.injected>0 ? myrUsdSpan(r.injected, rate) : '&mdash;'}</td>
+      <td>${r.runway===Infinity ? '&infin;' : r.runway.toFixed(1)}</td>
+    </tr>
+  `).join('');
+}
+
+// ---------- Charts ----------
+function makeSvg(w,h){
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.setAttribute('class','chart');
+  svg.style.width = '100%';
+  svg.style.height = 'auto';
+  svg.style.display = 'block';
+  return svg;
+}
+function el(tag, attrs){
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function fmtK(v){
+  if(Math.abs(v)>=1000) return (v/1000).toFixed(0)+'k';
+  return String(Math.round(v));
+}
+
+function lineChart(containerId, months, series, rate){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const W=820, H=260, M={top:14,right:16,bottom:26,left:56};
+  const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
+  const allVals = series.flatMap(s=>s.values);
+  const maxY = Math.max(0, ...allVals) * 1.12 || 1;
+  const minY = Math.min(0, ...allVals) * 1.12;
+  const range = (maxY-minY) || 1;
+  const xAt = i => M.left + (months.length<=1?0:i*(plotW/(months.length-1)));
+  const yAt = val => M.top + plotH - (val-minY)/range*plotH;
+
+  const svg = makeSvg(W,H);
+
+  // gridlines
+  const steps = 4;
+  for(let s=0;s<=steps;s++){
+    const val = minY + (range*s/steps);
+    const y = yAt(val);
+    svg.appendChild(el('line',{x1:M.left,y1:y,x2:W-M.right,y2:y,class:'gridline'}));
+    const t = el('text',{x:M.left-8,y:y,'text-anchor':'end',style:'font-size:9.5px;fill:#52514e;'});
+    t.textContent = 'RM '+fmtK(val);
+    svg.appendChild(t);
+    const tUsd = el('text',{x:M.left-8,y:y+10,'text-anchor':'end',style:'font-size:8.5px;fill:#b3b1a9;'});
+    tUsd.textContent = '≈$'+fmtK(val/rate);
+    svg.appendChild(tUsd);
+  }
+  // zero baseline
+  if(minY<0 && maxY>0){
+    svg.appendChild(el('line',{x1:M.left,y1:yAt(0),x2:W-M.right,y2:yAt(0),class:'baseline'}));
+  }
+  // x labels
+  const labelEvery = Math.max(1, Math.ceil(months.length/10));
+  months.forEach((mo,i)=>{
+    if(i===months.length-1 || (i%labelEvery===0 && (months.length-1-i) >= labelEvery/2)){
+      const t = el('text',{x:xAt(i),y:H-6,'text-anchor':'middle'});
+      t.textContent = 'M'+mo;
+      svg.appendChild(t);
+    }
+  });
+
+  series.forEach(s=>{
+    let d='';
+    s.values.forEach((val,i)=>{
+      d += (i===0?'M':'L') + xAt(i).toFixed(1) + ' ' + yAt(val).toFixed(1) + ' ';
+    });
+    svg.appendChild(el('path',{d, fill:'none', stroke:s.color, 'stroke-width':2, 'stroke-linejoin':'round'}));
+    const lastI = s.values.length-1;
+    svg.appendChild(el('circle',{cx:xAt(lastI), cy:yAt(s.values[lastI]), r:4, fill:s.color}));
+  });
+
+  const crosshair = el('line',{x1:0,y1:M.top,x2:0,y2:M.top+plotH,class:'crosshair'});
+  svg.appendChild(crosshair);
+
+  const overlay = el('rect',{x:M.left,y:M.top,width:plotW,height:plotH,fill:'transparent'});
+  svg.appendChild(overlay);
+  container.appendChild(svg);
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'tooltip';
+  container.appendChild(tooltip);
+
+  overlay.addEventListener('mousemove', (ev)=>{
+    const rectBox = svg.getBoundingClientRect();
+    const scaleX = W/rectBox.width;
+    const mx = (ev.clientX-rectBox.left)*scaleX;
+    let idx = Math.round((mx-M.left)/(plotW/(Math.max(1,months.length-1))));
+    idx = Math.max(0, Math.min(months.length-1, idx));
+    crosshair.setAttribute('x1', xAt(idx)); crosshair.setAttribute('x2', xAt(idx));
+    crosshair.style.display='block';
+    let html = `<div class="t-month">Month ${months[idx]} / Месяц ${months[idx]}</div>`;
+    series.forEach(s=>{
+      html += `<div class="t-row"><span class="t-dot" style="background:${s.color}"></span>${s.label}: ${fmtMYR(s.values[idx])} (&asymp;${fmtUSD(s.values[idx]/rate)})</div>`;
+    });
+    tooltip.innerHTML = html;
+    tooltip.style.display='block';
+    const rectBoxContainer = container.getBoundingClientRect();
+    let left = (ev.clientX-rectBoxContainer.left)+12;
+    let top = (ev.clientY-rectBoxContainer.top)+12;
+    if(left+180>rectBoxContainer.width) left -= 200;
+    tooltip.style.left = left+'px';
+    tooltip.style.top = top+'px';
+  });
+  overlay.addEventListener('mouseleave', ()=>{ crosshair.style.display='none'; tooltip.style.display='none'; });
+}
+
+function cashChart(containerId, months, values, injections, rate){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const W=820, H=260, M={top:14,right:16,bottom:26,left:56};
+  const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
+  const maxY = Math.max(0,...values)*1.12 || 1;
+  const minY = Math.min(0,...values)*1.12;
+  const range = (maxY-minY)||1;
+  const xAt = i => M.left + (months.length<=1?0:i*(plotW/(months.length-1)));
+  const yAt = val => M.top + plotH - (val-minY)/range*plotH;
+
+  const svg = makeSvg(W,H);
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const val = minY+(range*s/steps);
+    const y = yAt(val);
+    svg.appendChild(el('line',{x1:M.left,y1:y,x2:W-M.right,y2:y,class:'gridline'}));
+    const t = el('text',{x:M.left-8,y:y,'text-anchor':'end',style:'font-size:9.5px;fill:#52514e;'});
+    t.textContent = 'RM '+fmtK(val);
+    svg.appendChild(t);
+    const tUsd = el('text',{x:M.left-8,y:y+10,'text-anchor':'end',style:'font-size:8.5px;fill:#b3b1a9;'});
+    tUsd.textContent = '≈$'+fmtK(val/rate);
+    svg.appendChild(tUsd);
+  }
+  if(minY<0 && maxY>0) svg.appendChild(el('line',{x1:M.left,y1:yAt(0),x2:W-M.right,y2:yAt(0),class:'baseline'}));
+
+  const labelEvery = Math.max(1, Math.ceil(months.length/10));
+  months.forEach((mo,i)=>{
+    if(i===months.length-1 || (i%labelEvery===0 && (months.length-1-i) >= labelEvery/2)){
+      const t = el('text',{x:xAt(i),y:H-6,'text-anchor':'middle'});
+      t.textContent='M'+mo;
+      svg.appendChild(t);
+    }
+  });
+
+  let d='';
+  values.forEach((val,i)=>{ d += (i===0?'M':'L')+xAt(i).toFixed(1)+' '+yAt(val).toFixed(1)+' '; });
+  svg.appendChild(el('path',{d, fill:'none', stroke:'var(--series-1)'.replace('var(--series-1)','#2a78d6'), 'stroke-width':2}));
+
+  injections.forEach((inj,i)=>{
+    if(inj>0){
+      svg.appendChild(el('circle',{cx:xAt(i), cy:yAt(values[i]), r:5, fill:'#eda100', stroke:'#fff','stroke-width':1.5}));
+    }
+  });
+  const lastI = values.length-1;
+  svg.appendChild(el('circle',{cx:xAt(lastI), cy:yAt(values[lastI]), r:4, fill:'#2a78d6'}));
+
+  const crosshair = el('line',{x1:0,y1:M.top,x2:0,y2:M.top+plotH,class:'crosshair'});
+  svg.appendChild(crosshair);
+  const overlay = el('rect',{x:M.left,y:M.top,width:plotW,height:plotH,fill:'transparent'});
+  svg.appendChild(overlay);
+  container.appendChild(svg);
+
+  const tooltip = document.createElement('div');
+  tooltip.className='tooltip';
+  container.appendChild(tooltip);
+
+  overlay.addEventListener('mousemove',(ev)=>{
+    const rectBox = svg.getBoundingClientRect();
+    const scaleX = W/rectBox.width;
+    const mx = (ev.clientX-rectBox.left)*scaleX;
+    let idx = Math.round((mx-M.left)/(plotW/(Math.max(1,months.length-1))));
+    idx = Math.max(0, Math.min(months.length-1, idx));
+    crosshair.setAttribute('x1', xAt(idx)); crosshair.setAttribute('x2', xAt(idx));
+    crosshair.style.display='block';
+    let html = `<div class="t-month">Month ${months[idx]} / Месяц ${months[idx]}</div>`;
+    html += `<div class="t-row"><span class="t-dot" style="background:#2a78d6"></span>Cash / Баланс: ${fmtMYR(values[idx])} (&asymp;${fmtUSD(values[idx]/rate)})</div>`;
+    if(injections[idx]>0) html += `<div class="t-row"><span class="t-dot" style="background:#eda100"></span>Injected / Внесено: ${fmtMYR(injections[idx])} (&asymp;${fmtUSD(injections[idx]/rate)})</div>`;
+    tooltip.innerHTML = html;
+    tooltip.style.display='block';
+    const rectBoxContainer = container.getBoundingClientRect();
+    let left = (ev.clientX-rectBoxContainer.left)+12;
+    let top = (ev.clientY-rectBoxContainer.top)+12;
+    if(left+180>rectBoxContainer.width) left -= 200;
+    tooltip.style.left = left+'px';
+    tooltip.style.top = top+'px';
+  });
+  overlay.addEventListener('mouseleave', ()=>{ crosshair.style.display='none'; tooltip.style.display='none'; });
+}
+
+function stackedBarChart(containerId, months, seriesA, seriesB, labelA, labelB, colorA, colorB){
+  const container = document.getElementById(containerId);
+  container.innerHTML='';
+  const W=820, H=260, M={top:14,right:16,bottom:26,left:50};
+  const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
+  const totals = months.map((_,i)=>seriesA[i]+seriesB[i]);
+  const maxY = Math.max(1, ...totals)*1.12;
+  const barW = Math.max(1, (plotW/months.length)*0.7);
+  const xAt = i => M.left + i*(plotW/months.length) + (plotW/months.length - barW)/2;
+  const yAt = val => M.top + plotH - (val/maxY)*plotH;
+
+  const svg = makeSvg(W,H);
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const val = maxY*s/steps;
+    const y = yAt(val);
+    svg.appendChild(el('line',{x1:M.left,y1:y,x2:W-M.right,y2:y,class:'gridline'}));
+    const t = el('text',{x:M.left-8,y:y+3,'text-anchor':'end'});
+    t.textContent = fmtK(val);
+    svg.appendChild(t);
+  }
+  const labelEvery = Math.max(1, Math.ceil(months.length/10));
+  months.forEach((mo,i)=>{
+    if(i===months.length-1 || (i%labelEvery===0 && (months.length-1-i) >= labelEvery/2)){
+      const t = el('text',{x:xAt(i)+barW/2,y:H-6,'text-anchor':'middle'});
+      t.textContent='M'+mo;
+      svg.appendChild(t);
+    }
+  });
+
+  const tooltip = document.createElement('div');
+  tooltip.className='tooltip';
+
+  months.forEach((mo,i)=>{
+    const aVal = seriesA[i], bVal = seriesB[i];
+    const x = xAt(i);
+    const yA = yAt(aVal);
+    const rectA = el('rect',{x, y:yA, width:barW, height:(M.top+plotH-yA), fill:colorA});
+    const yB = yAt(aVal+bVal);
+    const rectB = el('rect',{x, y:yB, width:barW, height:(yA-yB-2>0?yA-yB-2:0), fill:colorB});
+    svg.appendChild(rectA);
+    svg.appendChild(rectB);
+    const hit = el('rect',{x, y:M.top, width:barW, height:plotH, fill:'transparent'});
+    hit.addEventListener('mousemove',(ev)=>{
+      const rectBoxContainer = container.getBoundingClientRect();
+      let html = `<div class="t-month">Month ${mo} / Месяц ${mo}</div>`;
+      html += `<div class="t-row"><span class="t-dot" style="background:${colorA}"></span>${labelA}: ${aVal}</div>`;
+      html += `<div class="t-row"><span class="t-dot" style="background:${colorB}"></span>${labelB}: ${bVal}</div>`;
+      html += `<div class="t-row">Total / Итого: ${aVal+bVal}</div>`;
+      tooltip.innerHTML = html;
+      tooltip.style.display='block';
+      let left = (ev.clientX-rectBoxContainer.left)+12;
+      let top = (ev.clientY-rectBoxContainer.top)+12;
+      if(left+180>rectBoxContainer.width) left -= 200;
+      tooltip.style.left = left+'px';
+      tooltip.style.top = top+'px';
+    });
+    hit.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
+    svg.appendChild(hit);
+  });
+
+  container.appendChild(svg);
+  container.appendChild(tooltip);
+}
+
+function renderCharts(data){
+  const months = data.rows.map(r=>r.m);
+  lineChart('chart1wrap', months, [
+    {label:'Revenue / Выручка', color:'#2a78d6', values:data.rows.map(r=>r.revenue)},
+    {label:'Total Cost / Общие затраты', color:'#eb6834', values:data.rows.map(r=>r.totalCost)},
+    {label:'Net Profit / Чистая прибыль', color:'#008300', values:data.rows.map(r=>r.netProfit)},
+  ], data.rate);
+
+  cashChart('chart2wrap', months, data.rows.map(r=>r.cashBalance), data.rows.map(r=>r.injected), data.rate);
+
+  stackedBarChart('chart3wrap', months, data.rows.map(r=>r.furnishedCum), data.rows.map(r=>r.unfurnishedCum),
+    'Furnished / Меблированные','Unfurnished / Немеблированные', '#2a78d6', '#1baf7a');
+}
+
+const usdHintFieldIds = [
+  'injectionMultipleRM',
+  'leaseFurnished','leaseUnfurnished','utilElectricity','utilWater','utilInternet','utilSewerage',
+  'setupCost','furnishingCostUnfurnished',
+  'officeRental','officeUtilities','officeSupplies','softwareFees',
+  'channelMarketing','socialPR',
+  'salGM','salOps','salCX','salCXExtra','salSales','salSalesExtra','salRE','salAccountant'
+];
+
+function updateCashHints(){
+  const rate = getEffectiveRate();
+  usdHintFieldIds.forEach(id=>{
+    const hintEl = document.getElementById(id+'UsdHint');
+    if(hintEl) hintEl.textContent = fmtUSD(v(id)/rate);
+  });
+}
+
+function renderCashCard(data){
+  const rate = data.rate;
+  const listEl = document.getElementById('historicalInjectionsList');
+  let html = '';
+  historicalInjections.forEach(inj=>{
+    const rmGross = inj.rmGross!==undefined ? inj.rmGross : inj.usdGross*rate;
+    const usdGross = inj.usdGross!==undefined ? inj.usdGross : inj.rmGross/rate;
+    html += `<div class="injection-row"><span>${inj.label}<span class="i18n-ru" style="display:block;">${inj.labelRu}</span></span><span class="amt">${fmtMYR(rmGross)} <span class="usd">(&asymp;${fmtUSD(usdGross)})</span></span></div>`;
+  });
+  html += `<div class="injection-row total"><span>Total raised to date<span class="i18n-ru" style="display:block;">Итого привлечено на сегодня</span></span><span class="amt">${fmtMYR(data.totalHistoricalInjectedGross)} <span class="usd">(&asymp;${fmtUSD(data.totalHistoricalInjectedGross/rate)})</span></span></div>`;
+  listEl.innerHTML = html;
+
+  document.getElementById('royaltyDepositRemainingHint').innerHTML =
+    `${fmtMYR(data.royaltyDepositBalance)}<span class="usd">&asymp;${fmtUSD(data.royaltyDepositBalance/rate)}</span>`;
+
+  const remainEl = document.getElementById('remainingInjectionsHint');
+  const warn = data.breakevenRow ? '' : ` <span style="color:var(--critical);font-size:11px;font-weight:600;">(breakeven not yet reached within horizon)</span>`;
+  remainEl.innerHTML = `${fmtMYR(data.remainingInjectionsToBreakeven)}<span class="usd">&asymp;${fmtUSD(data.remainingInjectionsToBreakeven/rate)}</span>${warn}`;
+}
+
+function recalcAndRender(){
+  const data = compute();
+  renderKPIs(data);
+  renderTable(data);
+  renderCharts(data);
+  updateCashHints();
+  renderCashCard(data);
+}
+
+function bindSliderDisplay(id, displayId, fmt){
+  const input = document.getElementById(id);
+  const disp = document.getElementById(displayId);
+  const update = ()=>{ disp.textContent = fmt(input.value); };
+  input.addEventListener('input', update);
+  update();
+}
+bindSliderDisplay('unitsPerMonth','unitsPerMonthVal', v=>v+' units/mo');
+bindSliderDisplay('furnishedPct','furnishedPctVal', v=>`${v}% F / ${100-v}% U`);
+bindSliderDisplay('utilisationPct','utilisationPctVal', v=>v+'%');
+bindSliderDisplay('revShareMixPct','revShareMixPctVal', v=>`${100-v}% Fixed Lease / ${v}% Revenue Share`);
+bindSliderDisplay('revShareBGPct','revShareBGPctVal', v=>`${v}% Blueground / ${100-v}% Landlord`);
+bindSliderDisplay('targetMarginPct','targetMarginPctVal', v=>v+'%');
+bindSliderDisplay('royaltyPct','royaltyPctVal', v=>v+'%');
+bindSliderDisplay('sstPct','sstPctVal', v=>v+'%');
+bindSliderDisplay('statutoryPct','statutoryPctVal', v=>v+'%');
+
+document.getElementById('btnResetAll').addEventListener('click', ()=>{
+  document.getElementById('exchangeRate').value = defaults['exchangeRate'];
+  fieldIds.forEach(id=>{ document.getElementById(id).value = defaults[id]; });
+  bindSliderDisplay('unitsPerMonth','unitsPerMonthVal', v=>v+' units/mo');
+  bindSliderDisplay('furnishedPct','furnishedPctVal', v=>`${v}% F / ${100-v}% U`);
+  bindSliderDisplay('utilisationPct','utilisationPctVal', v=>v+'%');
+  bindSliderDisplay('revShareMixPct','revShareMixPctVal', v=>`${100-v}% Fixed Lease / ${v}% Revenue Share`);
+  bindSliderDisplay('revShareBGPct','revShareBGPctVal', v=>`${v}% Blueground / ${100-v}% Landlord`);
+  bindSliderDisplay('targetMarginPct','targetMarginPctVal', v=>v+'%');
+  bindSliderDisplay('royaltyPct','royaltyPctVal', v=>v+'%');
+  bindSliderDisplay('sstPct','sstPctVal', v=>v+'%');
+  bindSliderDisplay('statutoryPct','statutoryPctVal', v=>v+'%');
+  recalcAndRender();
+});
+
+document.getElementById('exchangeRate').addEventListener('input', recalcAndRender);
+fieldIds.forEach(id=>{
+  document.getElementById(id).addEventListener('input', recalcAndRender);
+});
+
+recalcAndRender();
+
+const BANK_FX_ADJUSTMENT = 0.2;
+async function fetchLiveExchangeRate(){
+  const noteEl = document.getElementById('rateSourceNote');
+  try{
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    const json = await res.json();
+    const liveRate = json && json.rates && json.rates.MYR;
+    if(!liveRate) throw new Error('MYR rate missing from response');
+    const adjusted = liveRate - BANK_FX_ADJUSTMENT;
+    document.getElementById('exchangeRate').value = adjusted.toFixed(4);
+    if(noteEl){
+      noteEl.innerHTML = `Live global mid-market rate: ${liveRate.toFixed(4)} (fetched just now, adjusted &minus;0.2 for bank FX &amp; fees).<span class="i18n-ru" style="display:block;">Актуальный глобальный рыночный курс: ${liveRate.toFixed(4)} (загружен только что, скорректирован на &minus;0.2 с учётом банковских комиссий).</span>`;
+    }
+    recalcAndRender();
+  } catch(err){
+    document.getElementById('exchangeRate').value = GLOBAL_DEFAULT_RATE.toFixed(4);
+    if(noteEl){
+      noteEl.innerHTML = `Could not fetch a live rate just now &mdash; using ${GLOBAL_DEFAULT_RATE.toFixed(4)} as the default.<span class="i18n-ru" style="display:block;">Не удалось загрузить актуальный курс &mdash; используется значение по умолчанию ${GLOBAL_DEFAULT_RATE.toFixed(4)}.</span>`;
+    }
+    recalcAndRender();
+  }
+}
+fetchLiveExchangeRate();
+</script>
+
+</body>
+</html>
