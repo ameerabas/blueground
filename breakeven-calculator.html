@@ -261,6 +261,20 @@
             <div class="hint">Lease is paid, but unit earns no revenue for this period.</div>
             <div class="hint-ru">Аренда оплачивается, но юнит не приносит дохода в этот период.</div>
           </div>
+          <div class="field"><div class="field-label">Deposit (months of rent)</div>
+            <div class="field-label-ru">Депозит (в месяцах аренды)</div>
+            <input type="number" id="depositMonths" value="1.5" step="0.1"></div>
+          <div class="field"><div class="field-label">Advance rent (months of rent)</div>
+            <div class="field-label-ru">Аванс по аренде (в месяцах аренды)</div>
+            <input type="number" id="advanceRentMonths" value="1" step="0.1"></div>
+          <div class="field"><div class="field-label">BG specific setup</div>
+            <div class="field-label-ru">Настройка (расходы BG)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="setupCost" value="10000"></div>
+            <div class="hint">&asymp; <span id="setupCostUsdHint">$0</span></div></div>
+          <div class="field"><div class="field-label">BG furnishing cost (unfurnished apartments only)</div>
+            <div class="field-label-ru">Расходы BG на меблировку (только для немеблированных квартир)</div>
+            <div class="rm-prefix"><span>RM</span><input type="number" id="furnishingCostUnfurnished" value="10000"></div>
+            <div class="hint">&asymp; <span id="furnishingCostUnfurnishedUsdHint">$0</span></div></div>
         </div>
       </details>
 
@@ -304,7 +318,7 @@
         </div>
       </details>
 
-      <details class="card">
+      <details class="card" open>
         <summary><span class="summary-bi"><span>Costs Per Month (per unit)</span><span class="i18n-ru">Расходы в месяц (на юнит)</span></span></summary>
         <div class="card-body">
           <div class="field"><div class="field-label">Fixed Lease &mdash; Furnished Apartment</div>
@@ -333,26 +347,6 @@
             <div class="hint">&asymp; <span id="utilSewerageUsdHint">$0</span></div></div>
           <div class="hint">All utility line items are consolidated into one "Utilities" cost &amp; markup for the guest price.</div>
           <div class="hint-ru">Все статьи коммунальных услуг объединяются в одну статью «Коммунальные услуги» для расчёта стоимости и наценки для гостя.</div>
-        </div>
-      </details>
-
-      <details class="card">
-        <summary><span class="summary-bi"><span>Unit Acquisition Cost (one-time, per new unit)</span><span class="i18n-ru">Затраты на привлечение юнита (единоразово)</span></span></summary>
-        <div class="card-body">
-          <div class="field"><div class="field-label">Deposit (months of rent)</div>
-            <div class="field-label-ru">Депозит (в месяцах аренды)</div>
-            <input type="number" id="depositMonths" value="1.5" step="0.1"></div>
-          <div class="field"><div class="field-label">Advance rent (months of rent)</div>
-            <div class="field-label-ru">Аванс по аренде (в месяцах аренды)</div>
-            <input type="number" id="advanceRentMonths" value="1" step="0.1"></div>
-          <div class="field"><div class="field-label">BG specific setup</div>
-            <div class="field-label-ru">Настройка (расходы BG)</div>
-            <div class="rm-prefix"><span>RM</span><input type="number" id="setupCost" value="10000"></div>
-            <div class="hint">&asymp; <span id="setupCostUsdHint">$0</span></div></div>
-          <div class="field"><div class="field-label">BG furnishing cost (unfurnished apartments only)</div>
-            <div class="field-label-ru">Расходы BG на меблировку (только для немеблированных квартир)</div>
-            <div class="rm-prefix"><span>RM</span><input type="number" id="furnishingCostUnfurnished" value="10000"></div>
-            <div class="hint">&asymp; <span id="furnishingCostUnfurnishedUsdHint">$0</span></div></div>
         </div>
       </details>
 
